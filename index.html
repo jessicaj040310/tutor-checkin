@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peer Tutor Check-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #F5F3EE;
+      --card:     #FFFFFF;
+      --border:   #E2DDD6;
+      --text:     #1A1916;
+      --muted:    #6B6860;
+      --hint:     #A09D98;
+      --accent:   #2A5C8F;
+      --accent-bg:#EBF2FA;
+      --success:  #1D6F4E;
+      --success-bg:#E6F4EE;
+      --danger:   #C0392B;
+      --danger-bg:#FCECEA;
+      --radius:   14px;
+      --radius-sm:8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 15px;
+      color: var(--muted);
+      letter-spacing: .02em;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 460px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 1.75rem 1.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-head h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .card-head p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .card-body { padding: 1.5rem 1.75rem; }
+
+    .field { margin-bottom: 1.1rem; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      height: 44px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+
+    .field textarea {
+      height: 80px;
+      padding: 12px 14px;
+      resize: none;
+      line-height: 1.5;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+      background: #fff;
+    }
+
+    .field input.error,
+    .field select.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px var(--danger-bg);
+    }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--hint);
+      pointer-events: none;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: .25rem;
+      gap: 12px;
+    }
+
+    .toggle-label { font-size: 14px; color: var(--text); }
+    .toggle-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .toggle {
+      width: 40px; height: 22px;
+      background: var(--border);
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .toggle.on { background: var(--accent); }
+    .toggle-knob {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    .toggle.on .toggle-knob { transform: translateX(18px); }
+
+    #sched-field {
+      display: none;
+      margin-top: .75rem;
+      animation: fadeIn .2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .shoutout-hint {
+      font-size: 11px;
+      color: var(--hint);
+      margin-top: 4px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: .75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity .15s, transform .1s;
+    }
+    .submit-btn:hover { opacity: .88; }
+    .submit-btn:active { transform: scale(.98); }
+    .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .success-view {
+      display: none;
+      padding: 2.5rem 1.75rem;
+      text-align: center;
+      animation: fadeIn .3s ease;
+    }
+
+    .success-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--success-bg);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      font-size: 24px;
+    }
+
+    .success-view h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .success-view p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .success-summary {
+      margin-top: 1.25rem;
+      padding: .875rem 1rem;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      text-align: left;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .success-summary strong { color: var(--text); font-weight: 500; }
+
+    .back-btn {
+      margin-top: 1.25rem;
+      font-size: 13px;
+      color: var(--accent);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .error-banner {
+      display: none;
+      margin-top: .75rem;
+      padding: .75rem 1rem;
+      background: var(--danger-bg);
+      border: 1px solid #f5c6c2;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--danger);
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 1.25rem;
+      font-size: 12px;
+      color: var(--hint);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wordmark">Peer Tutor Center</div>
+
+  <div class="card">
+    <div class="card-head">
+      <h1>Check in</h1>
+      <p>A tutor will be notified as soon as you submit.</p>
+    </div>
+
+    <div class="card-body" id="form-view">
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="f-name" placeholder="First and last name" autocomplete="name">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Subject</label>
+          <div class="select-wrap">
+            <select id="f-subject">
+              <option value="">Select...</option>
+              <option>Math</option>
+              <option>English</option>
+              <option>Science</option>
+              <option>History / Social Studies</option>
+              <option>Foreign Language</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Course</label>
+          <input type="text" id="f-course" placeholder="e.g. Algebra II">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>What do you need help with?</label>
+        <textarea id="f-topic" placeholder="Briefly describe your question or topic..."></textarea>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Pre-schedule a session</div>
+          <div class="toggle-sub">Pick a specific shift instead of walk-in</div>
+        </div>
+        <div class="toggle" id="sched-toggle" onclick="toggleSched(this)" role="switch" aria-checked="false" tabindex="0">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div id="sched-field">
+        <div class="field" style="margin-bottom:0">
+          <label>Preferred shift</label>
+          <div class="select-wrap">
+            <select id="f-time">
+              <option>Today · Period 4 (1:45 pm)</option>
+              <option>Today · Period 6 (3:10 pm)</option>
+              <option>Tomorrow · Period 2 (9:50 am)</option>
+              <option>Tomorrow · Period 4 (1:45 pm)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:1.1rem">
+        <label>Tutor shoutout <span style="text-transform:none;font-weight:400;color:var(--hint)">(optional)</span></label>
+        <textarea id="f-shoutout" placeholder="Want to shout out a tutor who helped you? Name them here!"></textarea>
+        <div class="shoutout-hint">Featured in PT Spotlight ✦</div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+        <span id="btn-text">Check in</span>
+      </button>
+
+      <div class="error-banner" id="error-banner">
+        Something went wrong submitting your check-in. Please try again or let a tutor know you're here.
+      </div>
+    </div>
+
+    <div class="success-view" id="success-view">
+      <div class="success-icon">✓</div>
+      <h2>You're checked in!</h2>
+      <p>A tutor has been notified and will come find you shortly. Grab a seat and hang tight!</p>
+      <div class="success-summary" id="success-summary"></div>
+      <button class="back-btn" onclick="resetForm()">← Check in again</button>
+    </div>
+  </div>
+
+  <div class="footer">Responses are logged for tutoring verification records.</div>
+
+  <script>
+    // ── YOUR APPS SCRIPT URL ──────────────────────────────────────────
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzRA3mKwSplhLmA_yE9NA9-0glSZLBHG0pJ5l8o3wq6yiMekmi-kaZJjjwrAy52sLpqQ/exec";
+    // ─────────────────────────────────────────────────────────────────
+
+    function toggleSched(el) {
+      el.classList.toggle('on');
+      const on = el.classList.contains('on');
+      el.setAttribute('aria-checked', on);
+      document.getElementById('sched-field').style.display = on ? 'block' : 'none';
+    }
+
+    async function submitForm() {
+      const name    = document.getElementById('f-name').value.trim();
+      const subject = document.getElementById('f-subject').value;
+      const course  = document.getElementById('f-course').value.trim();
+      const topic   = document.getElementById('f-topic').value.trim();
+      const shoutout = document.getElementById('f-shoutout').value.trim();
+      const scheduled = document.getElementById('sched-toggle').classList.contains('on');
+      const scheduledTime = scheduled ? document.getElementById('f-time').value : '';
+
+      // Validation
+      let hasError = false;
+      document.getElementById('f-name').classList.toggle('error', !name);
+      document.getElementById('f-subject').classList.toggle('error', !subject);
+      if (!name || !subject) return;
+
+      // Loading state
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      btn.disabled = true;
+      btnText.innerHTML = '';
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      btn.appendChild(spinner);
+      document.getElementById('error-banner').style.display = 'none';
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, subject, course, topic, shoutout, scheduled, scheduledTime })
+        });
+
+        // Show success (no-cors means we can't read the response, but if fetch didn't throw, it sent)
+        document.getElementById('success-summary').innerHTML =
+          `<strong>${name}</strong> · ${subject}${course ? ' / ' + course : ''}<br>` +
+          (scheduled ? `Scheduled: ${scheduledTime}` : 'Walk-in · just now') +
+          (topic ? `<br>${topic}` : '');
+
+        document.getElementById('form-view').style.display = 'none';
+        document.getElementById('success-view').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('error-banner').style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Check in';
+        spinner.remove();
+      }
+    }
+
+    function resetForm() {
+      ['f-name','f-course','f-topic','f-shoutout'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-subject').value = '';
+      const tog = document.getElementById('sched-toggle');
+      tog.classList.remove('on');
+      tog.setAttribute('aria-checked', 'false');
+      document.getElementById('sched-field').style.display = 'none';
+      document.getElementById('form-view').style.display = 'block';
+      document.getElementById('success-view').style.display = 'none';
+      document.getElementById('error-banner').style.display = 'none';
+    }
+
+    // Clear error styling on input
+    document.getElementById('f-name').addEventListener('input', () => {
+      document.getElementById('f-name').classList.remove('error');
+    });
+    document.getElementById('f-subject').addEventListener('change', () => {
+      document.getElementById('f-subject').classList.remove('error');
+    });
+  </script>
+</body>
+</html>
