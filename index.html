@@ -10,12 +10,12 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #F5F3EE;
-      --card:     #FFFFFF;
-      --border:   #E2DDD6;
+      --bg:       #6aab6e;
+      --card:     #fdf3c0;
+      --border:   #d4c97a;
       --text:     #1A1916;
-      --muted:    #6B6860;
-      --hint:     #A09D98;
+      --muted:    #5a4e00;
+      --hint:     #8a7a20;
       --accent:   #2A5C8F;
       --accent-bg:#EBF2FA;
       --success:  #1D6F4E;
@@ -40,7 +40,7 @@
     .wordmark {
       font-family: 'DM Serif Display', serif;
       font-size: 15px;
-      color: var(--muted);
+      color: #000000;
       letter-spacing: .02em;
       margin-bottom: 1.5rem;
       text-align: center;
@@ -96,7 +96,7 @@
       font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       color: var(--text);
-      background: var(--bg);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       padding: 0 14px;
@@ -147,8 +147,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 0;
-      border-top: 1px solid var(--border);
+      padding: .75rem 0 1rem;
       margin-top: .25rem;
       gap: 12px;
     }
@@ -184,6 +183,31 @@
     }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .location-toggle {
+      display: flex;
+      gap: 8px;
+    }
+
+    .loc-btn {
+      flex: 1;
+      height: 44px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .loc-btn.active {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
     .shoutout-hint {
       font-size: 11px;
@@ -292,18 +316,19 @@
     .footer {
       margin-top: 1.25rem;
       font-size: 12px;
-      color: var(--hint);
+      color: rgba(255,255,255,0.7);
       text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <div class="wordmark">Peer Tutor Center</div>
+  <img src="logo.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
+  <div class="wordmark">SHS Peer Tutors</div>
 
   <div class="card">
     <div class="card-head">
-      <h1>Check in</h1>
+      <h1>Tutee Check In</h1>
       <p>A tutor will be notified as soon as you submit.</p>
     </div>
 
@@ -317,26 +342,22 @@
         <div class="field">
           <label>Subject</label>
           <div class="select-wrap">
-            <select id="f-subject">
+            <select id="f-subject" onchange="updateShifts()">
               <option value="">Select...</option>
               <option>Math</option>
-              <option>English</option>
+              <option>Communication Arts</option>
+              <option>Computer Science</option>
+              <option>Social Studies</option>
+              <option>Economics</option>
               <option>Science</option>
-              <option>History / Social Studies</option>
-              <option>Foreign Language</option>
-              <option>Other</option>
+              <option>Language</option>
             </select>
           </div>
         </div>
         <div class="field">
           <label>Course</label>
-          <input type="text" id="f-course" placeholder="e.g. Algebra II">
+          <input type="text" id="f-course" placeholder="i.e. Algebra II">
         </div>
-      </div>
-
-      <div class="field">
-        <label>What do you need help with?</label>
-        <textarea id="f-topic" placeholder="Briefly describe your question or topic..."></textarea>
       </div>
 
       <div class="toggle-row">
@@ -354,19 +375,26 @@
           <label>Preferred shift</label>
           <div class="select-wrap">
             <select id="f-time">
-              <option>Today · Period 4 (1:45 pm)</option>
-              <option>Today · Period 6 (3:10 pm)</option>
-              <option>Tomorrow · Period 2 (9:50 am)</option>
-              <option>Tomorrow · Period 4 (1:45 pm)</option>
+              <option value="">— select a subject first —</option>
             </select>
+          </div>
+          <div id="location-note" style="font-size:12px;color:var(--hint);margin-top:5px;display:none"></div>
+        </div>
+
+        <div id="location-field" style="display:none;margin-top:1rem">
+          <div class="field" style="margin-bottom:0">
+            <label>Location</label>
+            <div class="location-toggle">
+              <button type="button" class="loc-btn active" id="loc-ilc" onclick="selectLocation('ILC')">ILC</button>
+              <button type="button" class="loc-btn" id="loc-elc" onclick="selectLocation('ELC')">ELC</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="field" style="margin-top:1.1rem">
-        <label>Tutor shoutout <span style="text-transform:none;font-weight:400;color:var(--hint)">(optional)</span></label>
-        <textarea id="f-shoutout" placeholder="Want to shout out a tutor who helped you? Name them here!"></textarea>
-        <div class="shoutout-hint">Featured in PT Spotlight ✦</div>
+      <div class="field">
+        <label>What do you need help with?</label>
+        <textarea id="f-topic" placeholder="Briefly describe your question or topic..."></textarea>
       </div>
 
       <button class="submit-btn" id="submit-btn" onclick="submitForm()">
@@ -391,8 +419,81 @@
 
   <script>
     // ── YOUR APPS SCRIPT URL ──────────────────────────────────────────
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzRA3mKwSplhLmA_yE9NA9-0glSZLBHG0pJ5l8o3wq6yiMekmi-kaZJjjwrAy52sLpqQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0TF7v4Gnn6GW-sSWn8EMRWHQSRFmD3gWBRGvhnh4kjLXk4smul2wxIx_-OGkL9DiT/exec";
     // ─────────────────────────────────────────────────────────────────
+
+    const COMMON_PERIODS = [
+      "Before School · 7:30 – 8:30 AM",
+      "Period 4a · 11:10 – 11:30 AM",
+      "Period 4b · 11:37 – 11:57 AM",
+      "Period 5a · 12:02 – 12:22 PM",
+      "Period 5b · 12:29 – 12:49 PM",
+      "Period 6a · 12:54 – 1:14 PM",
+      "Period 6b · 1:21 – 1:41 PM",
+    ];
+
+    const SUBJECT_CONFIG = {
+      "Math":               { after: ["After School · 3:30 – 4:30 PM", "After School · 4:30 – 5:30 PM"], locations: ["ILC", "ELC"] },
+      "Communication Arts": { after: ["After School · 3:30 – 4:30 PM"],                                  locations: ["ILC", "ELC"] },
+      "Computer Science":   { after: ["After School · 3:30 – 4:30 PM", "After School · 4:30 – 5:30 PM"], locations: ["ILC", "ELC"] },
+      "Social Studies":     { after: ["After School · 3:30 – 4:00 PM"],                                  locations: ["ILC"] },
+      "Economics":          { after: ["After School · 3:30 – 4:00 PM"],                                  locations: ["ILC"] },
+      "Science":            { after: ["After School · 3:30 – 4:30 PM"],                                  locations: ["ILC", "ELC"] },
+      "Language":           { after: ["After School · 3:30 – 4:30 PM"],                                  locations: ["ILC"] },
+    };
+
+    let selectedLocation = "ILC";
+
+    function selectLocation(loc) {
+      selectedLocation = loc;
+      document.getElementById('loc-ilc').classList.toggle('active', loc === 'ILC');
+      document.getElementById('loc-elc').classList.toggle('active', loc === 'ELC');
+    }
+
+    function updateShifts() {
+      const subject  = document.getElementById('f-subject').value;
+      const select   = document.getElementById('f-time');
+      const locNote  = document.getElementById('location-note');
+      const locField = document.getElementById('location-field');
+      const config   = SUBJECT_CONFIG[subject];
+
+      select.innerHTML = '';
+
+      if (!config) {
+        select.innerHTML = '<option value="">— select a subject first —</option>';
+        locNote.style.display = 'none';
+        locField.style.display = 'none';
+        return;
+      }
+
+      [...COMMON_PERIODS, ...config.after].forEach(shift => {
+        const opt = document.createElement('option');
+        opt.value = shift;
+        opt.textContent = shift;
+        select.appendChild(opt);
+      });
+
+      if (config.locations.length > 1) {
+        locField.style.display = 'block';
+        locNote.style.display = 'none';
+        selectLocation('ILC');
+      } else {
+        locField.style.display = 'none';
+        selectedLocation = config.locations[0];
+        locNote.textContent = '📍 Tutoring in: ' + config.locations[0];
+        locNote.style.display = 'block';
+      }
+
+      document.getElementById('f-subject').classList.remove('error');
+    }
+
+    function nowTime() {
+      const d = new Date();
+      let h = d.getHours(), m = d.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+    }
 
     function toggleSched(el) {
       el.classList.toggle('on');
@@ -402,24 +503,23 @@
     }
 
     async function submitForm() {
-      const name    = document.getElementById('f-name').value.trim();
-      const subject = document.getElementById('f-subject').value;
-      const course  = document.getElementById('f-course').value.trim();
-      const topic   = document.getElementById('f-topic').value.trim();
-      const shoutout = document.getElementById('f-shoutout').value.trim();
+      const name      = document.getElementById('f-name').value.trim();
+      const subject   = document.getElementById('f-subject').value;
+      const course    = document.getElementById('f-course').value.trim();
+      const topic     = document.getElementById('f-topic').value.trim();
       const scheduled = document.getElementById('sched-toggle').classList.contains('on');
-      const scheduledTime = scheduled ? document.getElementById('f-time').value : '';
+      const scheduledTime = scheduled
+        ? document.getElementById('f-time').value
+        : nowTime();
+      const location  = selectedLocation || 'ILC';
 
-      // Validation
-      let hasError = false;
       document.getElementById('f-name').classList.toggle('error', !name);
       document.getElementById('f-subject').classList.toggle('error', !subject);
       if (!name || !subject) return;
 
-      // Loading state
-      const btn = document.getElementById('submit-btn');
+      const btn     = document.getElementById('submit-btn');
       const btnText = document.getElementById('btn-text');
-      btn.disabled = true;
+      btn.disabled  = true;
       btnText.innerHTML = '';
       const spinner = document.createElement('div');
       spinner.className = 'spinner';
@@ -431,13 +531,13 @@
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, subject, course, topic, shoutout, scheduled, scheduledTime })
+          body: JSON.stringify({ name, subject, course, topic, scheduled, scheduledTime, location })
         });
 
-        // Show success (no-cors means we can't read the response, but if fetch didn't throw, it sent)
         document.getElementById('success-summary').innerHTML =
           `<strong>${name}</strong> · ${subject}${course ? ' / ' + course : ''}<br>` +
-          (scheduled ? `Scheduled: ${scheduledTime}` : 'Walk-in · just now') +
+          (scheduled ? `Scheduled: ${scheduledTime}` : `Walk-in · arrived at ${scheduledTime}`) +
+          `<br>📍 ${location}` +
           (topic ? `<br>${topic}` : '');
 
         document.getElementById('form-view').style.display = 'none';
@@ -453,8 +553,12 @@
     }
 
     function resetForm() {
-      ['f-name','f-course','f-topic','f-shoutout'].forEach(id => document.getElementById(id).value = '');
+      ['f-name','f-course','f-topic'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('f-subject').value = '';
+      document.getElementById('f-time').innerHTML = '<option value="">— select a subject first —</option>';
+      document.getElementById('location-note').style.display = 'none';
+      document.getElementById('location-field').style.display = 'none';
+      selectedLocation = 'ILC';
       const tog = document.getElementById('sched-toggle');
       tog.classList.remove('on');
       tog.setAttribute('aria-checked', 'false');
@@ -464,7 +568,6 @@
       document.getElementById('error-banner').style.display = 'none';
     }
 
-    // Clear error styling on input
     document.getElementById('f-name').addEventListener('input', () => {
       document.getElementById('f-name').classList.remove('error');
     });
