@@ -720,6 +720,8 @@
         </div>
       </div>`).join('');
   }
+
+  function setFilter(f, btn) {
     currentFilter = f;
     document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
