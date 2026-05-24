@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PT Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #6aab6e;
+      --card:       #fdf3c0;
+      --white:      #ffffff;
+      --border:     #E2DDD6;
+      --text:       #1A1916;
+      --muted:      #6B6860;
+      --hint:       #A09D98;
+      --accent:     #2A5C8F;
+      --accent-bg:  #EBF2FA;
+      --success:    #1D6F4E;
+      --success-bg: #E6F4EE;
+      --warn:       #7A4F00;
+      --warn-bg:    #FFF3DC;
+      --radius:     14px;
+      --radius-sm:  8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Sign-in screen ── */
+
+    .signin-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+    }
+
+    .signin-logo {
+      width: 64px;
+      height: auto;
+      display: block;
+      margin: 0 auto 0.5rem;
+    }
+
+    .signin-wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 15px;
+      color: #000;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .signin-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+    }
+
+    .signin-head {
+      padding: 1.5rem 1.75rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .signin-head h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    .signin-head p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .signin-body { padding: 1.25rem 1.75rem; }
+
+    .field { margin-bottom: 1rem; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      height: 44px;
+      outline: none;
+      appearance: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    .field input.err,
+    .field select.err { border-color: #C0392B; box-shadow: 0 0 0 3px #FCECEA; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--hint);
+      pointer-events: none;
+    }
+
+    .loc-toggle { display: flex; gap: 8px; }
+
+    .loc-btn {
+      flex: 1;
+      height: 44px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .loc-btn.on {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .loc-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .start-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: .5rem;
+      transition: opacity .15s;
+    }
+
+    .start-btn:hover { opacity: .88; }
+
+    /* ── Dashboard screen ── */
+
+    .dash { display: none; max-width: 780px; margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 12px;
+    }
+
+    .topbar-left h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      color: #fff;
+    }
+
+    .topbar-left p { font-size: 13px; color: rgba(255,255,255,.8); margin-top: 3px; }
+
+    .topbar-badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+    .badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge-subj { background: var(--card); color: var(--text); }
+    .badge-loc  { background: #fff; color: var(--accent); }
+
+    .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px;
+      color: var(--success);
+      background: var(--success-bg);
+      border: 1px solid #b8dece;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
+
+    .icon-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #fff;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .15s;
+    }
+
+    .icon-btn:hover { background: rgba(255,255,255,.25); }
+    .icon-btn.spinning svg { animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .signout-btn {
+      font-size: 12px;
+      color: rgba(255,255,255,.7);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      padding: 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat {
+      background: rgba(255,255,255,.2);
+      border-radius: var(--radius-sm);
+      padding: .875rem 1rem;
+    }
+
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.8); margin-bottom: 4px; }
+    .stat-value { font-size: 26px; font-weight: 500; color: #fff; }
+    .stat-value.red   { color: #FFD6D6; }
+    .stat-value.green { color: #C8F7C5; }
+
+    .notif-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-bg);
+      border: 1px solid #b3cfe8;
+      border-radius: var(--radius-sm);
+      padding: .875rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 14px;
+      color: var(--accent);
+      animation: slideIn .25s ease;
+    }
+
+    @keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+    .notif-banner.show { display: flex; }
+    .notif-close { margin-left: auto; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 20px; line-height: 1; }
+
+    .panel {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: .875rem;
+    }
+
+    .section-head h2 {
+      font-size: 13px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--muted);
+    }
+
+    .filter-tabs { display: flex; gap: 4px; }
+
+    .ftab {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      cursor: pointer; transition: all .15s;
+    }
+
+    .ftab.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+    .queue { display: flex; flex-direction: column; gap: 8px; }
+
+    .empty-state {
+      text-align: center; padding: 2.5rem 1rem;
+      color: var(--hint); font-size: 14px;
+    }
+
+    .tutee-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .875rem 1rem;
+      display: flex; align-items: flex-start; gap: 12px;
+      transition: opacity .2s;
+    }
+
+    .tutee-card.is-new { border-left: 3px solid var(--accent); border-color: #b3cfe8; }
+    .tutee-card.is-helped { opacity: .45; }
+
+    .avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; flex-shrink: 0;
+    }
+
+    .av-blue   { background: #EBF2FA; color: #2A5C8F; }
+    .av-purple { background: #EEEDFE; color: #3C3489; }
+    .av-amber  { background: #FFF3DC; color: #7A4F00; }
+    .av-teal   { background: #E6F4EE; color: #1D6F4E; }
+    .av-pink   { background: #FFD6E0; color: #8B1A3A; }
+    .av-green  { background: #C8F7C5; color: #1D6F4E; }
+    .av-orange { background: #FFE5CC; color: #7A4F00; }
+
+    .tutee-body { flex: 1; min-width: 0; }
+    .tutee-name { font-size: 14px; font-weight: 500; color: var(--text); }
+
+    .tutee-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 3px; }
+
+    .pill {
+      font-size: 11px; padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .pill-subj { background: #F0F0F0; color: var(--muted); }
+    .pill-walkin { background: var(--accent-bg); color: var(--accent); }
+    .pill-sched { background: #EEEDFE; color: #3C3489; }
+    .pill-loc { background: #FFF3DC; color: #7A4F00; }
+
+    .tutee-topic { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .tutee-time { font-size: 11px; color: var(--hint); margin-top: 3px; }
+
+    .tutee-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+
+    .status-sel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 4px 26px 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #F5F5F5;
+      color: var(--text);
+      cursor: pointer; outline: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A09D98'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      transition: all .15s;
+    }
+
+    .status-sel.waiting     { background-color: #EBF2FA; border-color: #b3cfe8; color: var(--accent); }
+    .status-sel.in-progress { background-color: var(--warn-bg); border-color: #e8c97a; color: var(--warn); }
+    .status-sel.helped      { background-color: var(--success-bg); border-color: #b8dece; color: var(--success); }
+
+    .shoutout-card {
+      background: #FFFBF0;
+      border: 1px solid #f0e5b8;
+      border-radius: var(--radius-sm);
+      padding: .875rem 1rem;
+      display: flex; gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .shoutout-star { font-size: 18px; flex-shrink: 0; }
+    .shoutout-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .shoutout-from { font-size: 12px; color: var(--hint); margin-top: 2px; }
+
+    .last-updated { font-size: 11px; color: rgba(255,255,255,.6); text-align: center; margin-top: 1rem; }
+
+    .footer-sig { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── SIGN-IN SCREEN ── -->
+<div class="signin-wrap" id="signin-screen">
+  <img src="logo.png" alt="SHS logo" class="signin-logo">
+  <div class="signin-wordmark">SHS Peer Tutors</div>
+
+  <div class="signin-card">
+    <div class="signin-head">
+      <h1>Tutor sign in</h1>
+      <p>Sign in to see your tutee queue for this shift.</p>
+    </div>
+    <div class="signin-body">
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="t-name" placeholder="First and last name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Subject you tutor</label>
+        <div class="select-wrap">
+          <select id="t-subject" onchange="updateTutorLoc()">
+            <option value="">Select...</option>
+            <option>Math</option>
+            <option>Communication Arts</option>
+            <option>Computer Science</option>
+            <option>Social Studies</option>
+            <option>Economics</option>
+            <option>Science</option>
+            <option>Language</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="loc-field" style="display:none">
+        <label>Your location</label>
+        <div class="loc-toggle">
+          <button type="button" class="loc-btn on" id="t-ilc" onclick="setTutorLoc('ILC')">ILC</button>
+          <button type="button" class="loc-btn" id="t-elc" onclick="setTutorLoc('ELC')">ELC</button>
+        </div>
+      </div>
+      <div class="loc-note" id="loc-only-note" style="display:none"></div>
+      <button class="start-btn" onclick="startShift()">Start shift →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD SCREEN ── -->
+<div class="dash" id="dash-screen">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="dash-greeting">Welcome!</h1>
+      <p id="dash-date"></p>
+      <div class="topbar-badges">
+        <span class="badge badge-subj" id="dash-subj-badge"></span>
+        <span class="badge badge-loc"  id="dash-loc-badge"></span>
+      </div>
+    </div>
+    <div class="topbar-right" style="flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="live-pill"><div class="live-dot"></div>Live</div>
+        <button class="icon-btn" id="refresh-btn" onclick="loadData(true)">
+          <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh
+        </button>
+      </div>
+      <button class="signout-btn" onclick="signOut()">← Sign out</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Waiting</div><div class="stat-value red" id="s-waiting">—</div></div>
+    <div class="stat"><div class="stat-label">In progress</div><div class="stat-value" id="s-progress">—</div></div>
+    <div class="stat"><div class="stat-label">Helped today</div><div class="stat-value green" id="s-helped">—</div></div>
+    <div class="stat"><div class="stat-label">Total today</div><div class="stat-value" id="s-total">—</div></div>
+  </div>
+
+  <div class="notif-banner" id="notif-banner">
+    <span style="font-size:18px">🔔</span>
+    <span id="notif-text"></span>
+    <button class="notif-close" onclick="document.getElementById('notif-banner').classList.remove('show')">×</button>
+  </div>
+
+  <div class="panel">
+    <div class="section-head">
+      <h2>Tutee queue</h2>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setFilter('all',this)">All</button>
+        <button class="ftab" onclick="setFilter('mine',this)">My tutees</button>
+        <button class="ftab" onclick="setFilter('Waiting',this)">Waiting</button>
+        <button class="ftab" onclick="setFilter('Helped',this)">Helped</button>
+      </div>
+    </div>
+    <div class="queue" id="queue">
+      <div class="empty-state">Loading...</div>
+    </div>
+  </div>
+
+  <div class="panel" id="shoutouts-panel">
+    <div class="section-head"><h2>Shoutouts ✦</h2></div>
+    <div id="shoutouts"><p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p></div>
+  </div>
+
+  <div class="last-updated" id="last-updated"></div>
+  <div class="footer-sig">Responses are logged for tutoring verification records.</div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-QwcNyp0RZ8lF0I_f1J4acLui2H1Hjrjr281tbxkF6_HHeGCLsODPjmTLgaUYhmg47A/exec";
+  const REFRESH_MS = 30000;
+
+  const SUBJECT_LOCS = {
+    "Math":               ["ILC","ELC"],
+    "Communication Arts": ["ILC","ELC"],
+    "Computer Science":   ["ILC","ELC"],
+    "Social Studies":     ["ILC"],
+    "Economics":          ["ILC"],
+    "Science":            ["ILC","ELC"],
+    "Language":           ["ILC"],
+  };
+
+  const AVATAR_COLORS = ['av-blue','av-purple','av-amber','av-teal','av-pink','av-green','av-orange'];
+
+  let tutorName     = '';
+  let tutorSubject  = '';
+  let tutorLocation = 'ILC';
+  let allRows       = [];
+  let knownRows     = new Set();
+  let firstLoad     = true;
+  let currentFilter = 'all';
+
+  function initials(name) {
+    return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  }
+
+  function avatarColor(name) {
+    let h = 0;
+    for (let c of (name||'')) h = (h*31+c.charCodeAt(0)) & 0xffffffff;
+    return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    if (isNaN(d)) return ts;
+    const s = Math.floor((Date.now()-d)/1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s/60)+' min ago';
+    return Math.floor(s/3600)+' hr ago';
+  }
+
+  function statusClass(s) {
+    if (s==='Waiting') return 'waiting';
+    if (s==='In Progress') return 'in-progress';
+    if (s==='Helped') return 'helped';
+    return 'waiting';
+  }
+
+  // ── Tutor sign-in ───────────────────────────────────────
+
+  function updateTutorLoc() {
+    const subj = document.getElementById('t-subject').value;
+    const locs = SUBJECT_LOCS[subj] || [];
+    const locField = document.getElementById('loc-field');
+    const locNote  = document.getElementById('loc-only-note');
+
+    if (locs.length > 1) {
+      locField.style.display = 'block';
+      locNote.style.display  = 'none';
+      setTutorLoc('ILC');
+    } else if (locs.length === 1) {
+      locField.style.display = 'none';
+      locNote.style.display  = 'block';
+      locNote.textContent    = '📍 Tutoring in: ' + locs[0] + ' only';
+      tutorLocation = locs[0];
+    } else {
+      locField.style.display = 'none';
+      locNote.style.display  = 'none';
+    }
+  }
+
+  function setTutorLoc(loc) {
+    tutorLocation = loc;
+    document.getElementById('t-ilc').classList.toggle('on', loc==='ILC');
+    document.getElementById('t-elc').classList.toggle('on', loc==='ELC');
+  }
+
+  async function startShift() {
+    const name    = document.getElementById('t-name').value.trim();
+    const subject = document.getElementById('t-subject').value;
+
+    document.getElementById('t-name').classList.toggle('err', !name);
+    document.getElementById('t-subject').classList.toggle('err', !subject);
+    if (!name || !subject) return;
+
+    tutorName    = name;
+    tutorSubject = subject;
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type:      'tutor_signin',
+          tutorName: name,
+          subject:   subject,
+          location:  tutorLocation
+        })
+      });
+    } catch(e) { /* silent fail — dashboard still loads */ }
+
+    // Show dashboard
+    document.getElementById('signin-screen').style.display = 'none';
+    document.getElementById('dash-screen').style.display   = 'block';
+
+    const first = name.split(' ')[0];
+    document.getElementById('dash-greeting').textContent   = 'Welcome, ' + first + '!';
+    document.getElementById('dash-subj-badge').textContent = subject;
+    document.getElementById('dash-loc-badge').textContent  = '📍 ' + tutorLocation;
+
+    const d = new Date();
+    document.getElementById('dash-date').textContent =
+      d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+    if (Notification && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    loadData();
+    setInterval(() => loadData(), REFRESH_MS);
+  }
+
+  function signOut() {
+    document.getElementById('dash-screen').style.display   = 'none';
+    document.getElementById('signin-screen').style.display = 'flex';
+    allRows = []; knownRows = new Set(); firstLoad = true; currentFilter = 'all';
+    document.getElementById('t-name').value    = '';
+    document.getElementById('t-subject').value = '';
+    document.getElementById('loc-field').style.display    = 'none';
+    document.getElementById('loc-only-note').style.display = 'none';
+  }
+
+  // ── Dashboard data ──────────────────────────────────────
+
+  function isMine(row) {
+    return row.subject === tutorSubject && row.location === tutorLocation;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderQueue();
+  }
+
+  function visibleRows() {
+    let rows = [...allRows].reverse();
+    if (currentFilter === 'mine')    return rows.filter(isMine);
+    if (currentFilter === 'Waiting') return rows.filter(r => r.status === 'Waiting');
+    if (currentFilter === 'Helped')  return rows.filter(r => r.status === 'Helped');
+    return rows;
+  }
+
+  function renderQueue() {
+    const el   = document.getElementById('queue');
+    const rows = visibleRows();
+
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state">No tutees to show yet.</div>';
+      return;
+    }
+
+    el.innerHTML = rows.map(r => {
+      const mine    = isMine(r);
+      const isNew   = mine && r.status==='Waiting' && !firstLoad && !knownRows.has(r.row);
+      const sc      = statusClass(r.status);
+      const typeClass = r.type==='Scheduled' ? 'pill-sched' : 'pill-walkin';
+
+      return `
+        <div class="tutee-card${isNew?' is-new':''}${r.status==='Helped'?' is-helped':''}" id="card-${r.row}">
+          <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
+          <div class="tutee-body">
+            <div class="tutee-name">${r.name||'—'}</div>
+            <div class="tutee-pills">
+              <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
+              <span class="pill ${typeClass}">${r.type||'Walk-in'}</span>
+              <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+            </div>
+            ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
+            <div class="tutee-time">${r.scheduledTime && r.type==='Scheduled' ? 'Scheduled: '+r.scheduledTime : (r.scheduledTime ? 'Arrived: '+r.scheduledTime : timeAgo(r.timestamp))}</div>
+          </div>
+          <div class="tutee-right">
+            <select class="status-sel ${sc}" onchange="updateStatus(${r.row},this.value,this)">
+              <option value="Waiting"     ${r.status==='Waiting'     ?'selected':''}>Waiting</option>
+              <option value="In Progress" ${r.status==='In Progress' ?'selected':''}>In progress</option>
+              <option value="Helped"      ${r.status==='Helped'      ?'selected':''}>Helped</option>
+            </select>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderShoutouts() {
+    const shouts = [...allRows].reverse().filter(r => r.shoutout && r.shoutout.trim());
+    const el = document.getElementById('shoutouts');
+    if (!shouts.length) {
+      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p>';
+      return;
+    }
+    el.innerHTML = shouts.map(r => `
+      <div class="shoutout-card">
+        <div class="shoutout-star">★</div>
+        <div>
+          <div class="shoutout-text">${r.shoutout}</div>
+          <div class="shoutout-from">— ${r.name} · ${r.subject}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function updateStats() {
+    const mine = allRows.filter(isMine);
+    document.getElementById('s-waiting').textContent  = mine.filter(r=>r.status==='Waiting').length;
+    document.getElementById('s-progress').textContent = mine.filter(r=>r.status==='In Progress').length;
+    document.getElementById('s-helped').textContent   = mine.filter(r=>r.status==='Helped').length;
+    document.getElementById('s-total').textContent    = mine.length;
+  }
+
+  function showNotif(newRows) {
+    if (!newRows.length) return;
+    const text = newRows.length===1
+      ? `${newRows[0].name} just checked in — ${newRows[0].subject} · ${newRows[0].location}`
+      : `${newRows.length} new tutees checked in`;
+    document.getElementById('notif-text').textContent = text;
+    const banner = document.getElementById('notif-banner');
+    banner.classList.add('show');
+    if (Notification.permission==='granted') new Notification('New tutee!', { body: text });
+    clearTimeout(window._nt);
+    window._nt = setTimeout(() => banner.classList.remove('show'), 8000);
+  }
+
+  async function updateStatus(rowNum, newStatus, sel) {
+    sel.className = 'status-sel ' + statusClass(newStatus);
+    const card = document.getElementById('card-'+rowNum);
+    if (card) card.classList.toggle('is-helped', newStatus==='Helped');
+    const row = allRows.find(r=>r.row===rowNum);
+    if (row) row.status = newStatus;
+    updateStats();
+    try {
+      await fetch(`${SCRIPT_URL}?action=update&row=${rowNum}&status=${encodeURIComponent(newStatus)}`);
+    } catch(e) {}
+  }
+
+  async function loadData(manual=false) {
+    const btn  = document.getElementById('refresh-btn');
+    const icon = document.getElementById('refresh-icon');
+    if (btn) btn.classList.add('spinning');
+
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?action=data&_=${Date.now()}`);
+      const json = await res.json();
+      const rows = json.rows || [];
+
+      if (!firstLoad) {
+        const newMine = rows.filter(r => isMine(r) && r.status==='Waiting' && !knownRows.has(r.row));
+        if (newMine.length) showNotif(newMine);
+      }
+
+      knownRows = new Set(rows.map(r=>r.row));
+      allRows   = rows;
+      firstLoad = false;
+
+      renderQueue();
+      renderShoutouts();
+      updateStats();
+
+      const now = new Date();
+      document.getElementById('last-updated').textContent =
+        'Last updated: ' + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+    } catch(err) {
+      if (firstLoad) document.getElementById('queue').innerHTML =
+        '<div class="empty-state">Could not load data. Check your Apps Script URL.</div>';
+    } finally {
+      if (btn) btn.classList.remove('spinning');
+    }
+  }
+</script>
+</body>
+</html>
