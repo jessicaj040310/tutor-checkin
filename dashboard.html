@@ -510,10 +510,10 @@
     <div class="section-head">
       <h2>Tutee queue</h2>
       <div class="filter-tabs">
-        <button class="ftab active" onclick="setFilter('all',this)">All</button>
-        <button class="ftab" onclick="setFilter('mine',this)">My tutees</button>
+        <button class="ftab active" onclick="setFilter('mine',this)">My tutees</button>
+        <button class="ftab" onclick="setFilter('all',this)">All</button>
         <button class="ftab" onclick="setFilter('Waiting',this)">Waiting</button>
-        <button class="ftab" onclick="setFilter('Helped',this)">Helped</button>
+        <button class="ftab" onclick="setFilter('In Progress',this)">In progress</button>
       </div>
     </div>
     <div class="queue" id="queue">
@@ -521,7 +521,15 @@
     </div>
   </div>
 
-  <div class="panel" id="shoutouts-panel">
+  <div class="panel" id="completed-panel">
+    <div class="section-head" onclick="toggleCompleted()" style="cursor:pointer">
+      <h2>Completed <span id="completed-count" style="background:#D5F5E3;color:#1D6F4E;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
+      <span id="completed-arrow" style="color:var(--muted);font-size:18px;transition:transform .2s">▸</span>
+    </div>
+    <div id="completed-list" style="display:none;margin-top:.5rem">
+      <p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>
+    </div>
+  </div>
     <div class="section-head"><h2>Shoutouts ✦</h2></div>
     <div id="shoutouts"><p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p></div>
   </div>
@@ -552,7 +560,7 @@
   let allRows       = [];
   let knownRows     = new Set();
   let firstLoad     = true;
-  let currentFilter = 'all';
+  let currentFilter = 'mine';
 
   function initials(name) {
     return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -659,7 +667,7 @@
   function signOut() {
     document.getElementById('dash-screen').style.display   = 'none';
     document.getElementById('signin-screen').style.display = 'flex';
-    allRows = []; knownRows = new Set(); firstLoad = true; currentFilter = 'all';
+    allRows = []; knownRows = new Set(); firstLoad = true; currentFilter = 'mine';
     document.getElementById('t-name').value    = '';
     document.getElementById('t-subject').value = '';
     document.getElementById('loc-field').style.display    = 'none';
@@ -672,7 +680,46 @@
     return row.subject === tutorSubject && row.location === tutorLocation;
   }
 
-  function setFilter(f, btn) {
+  function toggleCompleted() {
+    const list  = document.getElementById('completed-list');
+    const arrow = document.getElementById('completed-arrow');
+    const open  = list.style.display === 'block';
+    list.style.display  = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(90deg)';
+  }
+
+  function renderCompleted() {
+    const helped = [...allRows].reverse().filter(r => r.status === 'Helped' && isMine(r));
+    const count  = document.getElementById('completed-count');
+    const list   = document.getElementById('completed-list');
+    count.textContent = helped.length;
+
+    if (!helped.length) {
+      list.innerHTML = '<p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>';
+      return;
+    }
+
+    list.innerHTML = helped.map(r => `
+      <div class="tutee-card" style="opacity:.6;margin-bottom:8px" id="card-${r.row}">
+        <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
+        <div class="tutee-body">
+          <div class="tutee-name">${r.name||'—'}</div>
+          <div class="tutee-pills">
+            <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
+            <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+          </div>
+          ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
+          <div class="tutee-time">${r.scheduledTime ? 'Arrived: '+r.scheduledTime : timeAgo(r.timestamp)}</div>
+        </div>
+        <div class="tutee-right">
+          <select class="status-sel helped" onchange="updateStatus(${r.row},this.value,this)">
+            <option value="Waiting"     >Waiting</option>
+            <option value="In Progress" >In progress</option>
+            <option value="Helped" selected>Helped ✓</option>
+          </select>
+        </div>
+      </div>`).join('');
+  }
     currentFilter = f;
     document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
@@ -680,11 +727,11 @@
   }
 
   function visibleRows() {
-    let rows = [...allRows].reverse();
-    if (currentFilter === 'mine')    return rows.filter(isMine);
-    if (currentFilter === 'Waiting') return rows.filter(r => r.status === 'Waiting');
-    if (currentFilter === 'Helped')  return rows.filter(r => r.status === 'Helped');
-    return rows;
+    let rows = [...allRows].reverse().filter(r => r.status !== 'Helped');
+    if (currentFilter === 'mine')        return rows.filter(isMine);
+    if (currentFilter === 'Waiting')     return rows.filter(r => r.status === 'Waiting' && isMine(r));
+    if (currentFilter === 'In Progress') return rows.filter(r => r.status === 'In Progress' && isMine(r));
+    return rows; // 'all'
   }
 
   function renderQueue() {
@@ -796,6 +843,7 @@
       firstLoad = false;
 
       renderQueue();
+      renderCompleted();
       renderShoutouts();
       updateStats();
 
