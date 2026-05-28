@@ -405,6 +405,9 @@
     .status-sel.waiting     { background-color: #EBF2FA; border-color: #b3cfe8; color: var(--accent); }
     .status-sel.in-progress { background-color: var(--warn-bg); border-color: #e8c97a; color: var(--warn); }
     .status-sel.helped      { background-color: var(--success-bg); border-color: #b8dece; color: var(--success); }
+    .status-sel.no-show     { background-color: #F5F5F5; border-color: #ccc; color: var(--hint); }
+
+    .presched-card { border-left: 3px solid #a78bfa; border-color: #d4b8ff; background: #faf5ff; }
 
     .shoutout-card {
       background: #FFFBF0;
@@ -514,6 +517,7 @@
         <button class="ftab" onclick="setFilter('all',this)">All</button>
         <button class="ftab" onclick="setFilter('Waiting',this)">Waiting</button>
         <button class="ftab" onclick="setFilter('In Progress',this)">In progress</button>
+        <button class="ftab" onclick="setFilter('presched',this)">Pre-scheduled</button>
       </div>
     </div>
     <div class="queue" id="queue">
@@ -530,6 +534,16 @@
       <p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>
     </div>
   </div>
+
+  <div class="panel" id="noshow-panel">
+    <div class="section-head" onclick="toggleNoShow()" style="cursor:pointer">
+      <h2>No shows <span id="noshow-count" style="background:#FFE5CC;color:#7A4F00;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
+      <span id="noshow-arrow" style="color:var(--muted);font-size:18px;transition:transform .2s">▸</span>
+    </div>
+    <div id="noshow-list" style="display:none;margin-top:.5rem">
+      <p style="font-size:14px;color:var(--hint)">No no-shows recorded.</p>
+    </div>
+  </div>
     <div class="section-head"><h2>Shoutouts ✦</h2></div>
     <div id="shoutouts"><p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p></div>
   </div>
@@ -539,7 +553,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-QwcNyp0RZ8lF0I_f1J4acLui2H1Hjrjr281tbxkF6_HHeGCLsODPjmTLgaUYhmg47A/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaH0ouPlJ8k4FVebBg70FPSht2mPRJM_eHpueIO9ncC76wlNJkE3UzfGV555EZX6SN3w/exec";
   const REFRESH_MS = 30000;
 
   const SUBJECT_LOCS = {
@@ -582,14 +596,183 @@
     return Math.floor(s/3600)+' hr ago';
   }
 
+  // Format "05/24/2026 2:34 PM" → "May 24 · 2:34 PM"
+  function formatArrival(ts) {
+    if (!ts) return '';
+    const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
+    if (match) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const month = months[parseInt(match[1])-1];
+      const day   = parseInt(match[2]);
+      return `${month} ${day} · ${match[4]}:${match[5]} ${match[6].toUpperCase()}`;
+    }
+    return ts;
+  }
+
+  // Parse start time from shift string like "Period 5a · 12:02 – 12:22 PM"
+  function parseShiftStart(scheduledTime) {
+    if (!scheduledTime) return null;
+    // Match first time and AM/PM (could be at end of string)
+    const match = scheduledTime.match(/(\d{1,2}):(\d{2})\s*(?:[–\-].*?)?\s*(AM|PM)/i);
+    if (!match) return null;
+    let h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM' && h !== 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  }
+
+  // Has this scheduled tutee's period started yet?
+  function shiftStarted(row) {
+    if (row.type !== 'Scheduled') return true;
+    const start = parseShiftStart(row.scheduledTime);
+    if (!start) return true;
+    return new Date() >= start;
+  }
+
   function statusClass(s) {
-    if (s==='Waiting') return 'waiting';
+    if (s==='Waiting')     return 'waiting';
     if (s==='In Progress') return 'in-progress';
-    if (s==='Helped') return 'helped';
+    if (s==='Helped')      return 'helped';
+    if (s==='No Show')     return 'no-show';
     return 'waiting';
   }
 
-  // ── Tutor sign-in ───────────────────────────────────────
+  function isActive(row) {
+    return row.status !== 'Helped' && row.status !== 'No Show' && shiftStarted(row);
+  }
+
+  function isPresched(row) {
+    return row.type === 'Scheduled' && row.status === 'Waiting' && !shiftStarted(row);
+  }
+
+  function visibleRows() {
+    if (currentFilter === 'presched') return [...allRows].reverse().filter(isPresched).filter(isMine);
+    let rows = [...allRows].reverse().filter(isActive);
+    if (currentFilter === 'mine')        return rows.filter(isMine);
+    if (currentFilter === 'Waiting')     return rows.filter(r => r.status === 'Waiting' && isMine(r));
+    if (currentFilter === 'In Progress') return rows.filter(r => r.status === 'In Progress' && isMine(r));
+    return rows;
+  }
+
+  function arrivalLine(r) {
+    if (r.type === 'Scheduled' && r.scheduledTime) return 'Scheduled: ' + r.scheduledTime;
+    if (r.timestamp) return 'Arrived: ' + formatArrival(r.timestamp);
+    return '';
+  }
+
+  function statusOptions(current) {
+    const opts = [
+      ['Waiting',     'Waiting'],
+      ['In Progress', 'In progress'],
+      ['Helped',      'Helped ✓'],
+      ['No Show',     'No show'],
+    ];
+    return opts.map(([val, label]) =>
+      `<option value="${val}"${current===val?' selected':''}>${label}</option>`
+    ).join('');
+  }
+
+  function renderQueue() {
+    const el   = document.getElementById('queue');
+    const rows = visibleRows();
+
+    if (currentFilter === 'presched' && !rows.length) {
+      el.innerHTML = '<div class="empty-state">No upcoming scheduled tutees.</div>';
+      return;
+    }
+
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state">No tutees to show yet.</div>';
+      return;
+    }
+
+    el.innerHTML = rows.map(r => {
+      const mine      = isMine(r);
+      const isNew     = mine && r.status==='Waiting' && !firstLoad && !knownRows.has(r.row);
+      const sc        = statusClass(r.status);
+      const typeClass = r.type==='Scheduled' ? 'pill-sched' : 'pill-walkin';
+      const presched  = isPresched(r);
+
+      return `
+        <div class="tutee-card${isNew?' is-new':''}${presched?' presched-card':''}" id="card-${r.row}">
+          <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
+          <div class="tutee-body">
+            <div class="tutee-name">${r.name||'—'}</div>
+            <div class="tutee-pills">
+              <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
+              <span class="pill ${typeClass}">${r.type||'Walk-in'}</span>
+              <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+            </div>
+            ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
+            <div class="tutee-time">${arrivalLine(r)}</div>
+          </div>
+          <div class="tutee-right">
+            <select class="status-sel ${sc}" onchange="updateStatus(${r.row},this.value,this)">
+              ${statusOptions(r.status)}
+            </select>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Parse "MM/dd/yyyy h:mm a" into a Date for sorting
+  function parseTimestamp(ts) {
+    if (!ts) return new Date(0);
+    const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
+    if (!match) return new Date(0);
+    let h = parseInt(match[4]);
+    const ampm = match[6].toUpperCase();
+    if (ampm === 'PM' && h !== 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return new Date(parseInt(match[3]), parseInt(match[1])-1, parseInt(match[2]), h, parseInt(match[5]));
+  }
+
+  function renderCompleted() {
+    const helped = allRows
+      .filter(r => r.status === 'Helped'  && isMine(r))
+      .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
+
+    const noshow = allRows
+      .filter(r => r.status === 'No Show' && isMine(r))
+      .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
+
+    // Completed
+    document.getElementById('completed-count').textContent = helped.length;
+    const cList = document.getElementById('completed-list');
+    cList.innerHTML = helped.length
+      ? helped.map(r => completedCard(r, 'Helped')).join('')
+      : '<p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>';
+
+    // No shows
+    document.getElementById('noshow-count').textContent = noshow.length;
+    const nList = document.getElementById('noshow-list');
+    nList.innerHTML = noshow.length
+      ? noshow.map(r => completedCard(r, 'No Show')).join('')
+      : '<p style="font-size:14px;color:var(--hint)">No no-shows recorded.</p>';
+  }
+
+  function completedCard(r, currentStatus) {
+    return `
+      <div class="tutee-card" style="opacity:.6;margin-bottom:8px">
+        <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
+        <div class="tutee-body">
+          <div class="tutee-name">${r.name||'—'}</div>
+          <div class="tutee-pills">
+            <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
+            <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+          </div>
+          <div class="tutee-time">${arrivalLine(r)}</div>
+        </div>
+        <div class="tutee-right">
+          <select class="status-sel ${statusClass(currentStatus)}" onchange="updateStatus(${r.row},this.value,this)">
+            ${statusOptions(currentStatus)}
+          </select>
+        </div>
+      </div>`;
+  }
 
   function updateTutorLoc() {
     const subj = document.getElementById('t-subject').value;
@@ -680,47 +863,6 @@
     return row.subject === tutorSubject && row.location === tutorLocation;
   }
 
-  function toggleCompleted() {
-    const list  = document.getElementById('completed-list');
-    const arrow = document.getElementById('completed-arrow');
-    const open  = list.style.display === 'block';
-    list.style.display  = open ? 'none' : 'block';
-    arrow.style.transform = open ? '' : 'rotate(90deg)';
-  }
-
-  function renderCompleted() {
-    const helped = [...allRows].reverse().filter(r => r.status === 'Helped' && isMine(r));
-    const count  = document.getElementById('completed-count');
-    const list   = document.getElementById('completed-list');
-    count.textContent = helped.length;
-
-    if (!helped.length) {
-      list.innerHTML = '<p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>';
-      return;
-    }
-
-    list.innerHTML = helped.map(r => `
-      <div class="tutee-card" style="opacity:.6;margin-bottom:8px" id="card-${r.row}">
-        <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
-        <div class="tutee-body">
-          <div class="tutee-name">${r.name||'—'}</div>
-          <div class="tutee-pills">
-            <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
-            <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
-          </div>
-          ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
-          <div class="tutee-time">${r.scheduledTime ? 'Arrived: '+r.scheduledTime : timeAgo(r.timestamp)}</div>
-        </div>
-        <div class="tutee-right">
-          <select class="status-sel helped" onchange="updateStatus(${r.row},this.value,this)">
-            <option value="Waiting"     >Waiting</option>
-            <option value="In Progress" >In progress</option>
-            <option value="Helped" selected>Helped ✓</option>
-          </select>
-        </div>
-      </div>`).join('');
-  }
-
   function setFilter(f, btn) {
     currentFilter = f;
     document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
@@ -728,51 +870,20 @@
     renderQueue();
   }
 
-  function visibleRows() {
-    let rows = [...allRows].reverse().filter(r => r.status !== 'Helped');
-    if (currentFilter === 'mine')        return rows.filter(isMine);
-    if (currentFilter === 'Waiting')     return rows.filter(r => r.status === 'Waiting' && isMine(r));
-    if (currentFilter === 'In Progress') return rows.filter(r => r.status === 'In Progress' && isMine(r));
-    return rows; // 'all'
+  function toggleCompleted() {
+    const list  = document.getElementById('completed-list');
+    const arrow = document.getElementById('completed-arrow');
+    const open  = list.style.display === 'block';
+    list.style.display    = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(90deg)';
   }
 
-  function renderQueue() {
-    const el   = document.getElementById('queue');
-    const rows = visibleRows();
-
-    if (!rows.length) {
-      el.innerHTML = '<div class="empty-state">No tutees to show yet.</div>';
-      return;
-    }
-
-    el.innerHTML = rows.map(r => {
-      const mine    = isMine(r);
-      const isNew   = mine && r.status==='Waiting' && !firstLoad && !knownRows.has(r.row);
-      const sc      = statusClass(r.status);
-      const typeClass = r.type==='Scheduled' ? 'pill-sched' : 'pill-walkin';
-
-      return `
-        <div class="tutee-card${isNew?' is-new':''}${r.status==='Helped'?' is-helped':''}" id="card-${r.row}">
-          <div class="avatar ${avatarColor(r.name)}">${initials(r.name)}</div>
-          <div class="tutee-body">
-            <div class="tutee-name">${r.name||'—'}</div>
-            <div class="tutee-pills">
-              <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
-              <span class="pill ${typeClass}">${r.type||'Walk-in'}</span>
-              <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
-            </div>
-            ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
-            <div class="tutee-time">${r.scheduledTime && r.type==='Scheduled' ? 'Scheduled: '+r.scheduledTime : (r.scheduledTime ? 'Arrived: '+r.scheduledTime : timeAgo(r.timestamp))}</div>
-          </div>
-          <div class="tutee-right">
-            <select class="status-sel ${sc}" onchange="updateStatus(${r.row},this.value,this)">
-              <option value="Waiting"     ${r.status==='Waiting'     ?'selected':''}>Waiting</option>
-              <option value="In Progress" ${r.status==='In Progress' ?'selected':''}>In progress</option>
-              <option value="Helped"      ${r.status==='Helped'      ?'selected':''}>Helped</option>
-            </select>
-          </div>
-        </div>`;
-    }).join('');
+  function toggleNoShow() {
+    const list  = document.getElementById('noshow-list');
+    const arrow = document.getElementById('noshow-arrow');
+    const open  = list.style.display === 'block';
+    list.style.display    = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(90deg)';
   }
 
   function renderShoutouts() {
@@ -815,11 +926,11 @@
 
   async function updateStatus(rowNum, newStatus, sel) {
     sel.className = 'status-sel ' + statusClass(newStatus);
-    const card = document.getElementById('card-'+rowNum);
-    if (card) card.classList.toggle('is-helped', newStatus==='Helped');
     const row = allRows.find(r=>r.row===rowNum);
     if (row) row.status = newStatus;
     updateStats();
+    renderQueue();
+    renderCompleted();
     try {
       await fetch(`${SCRIPT_URL}?action=update&row=${rowNum}&status=${encodeURIComponent(newStatus)}`);
     } catch(e) {}
