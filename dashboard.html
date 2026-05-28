@@ -544,11 +544,11 @@
       <p style="font-size:14px;color:var(--hint)">No no-shows recorded.</p>
     </div>
   </div>
+  <div class="panel">
     <div class="section-head"><h2>Shoutouts ✦</h2></div>
     <div id="shoutouts"><p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p></div>
   </div>
 
-  <div class="last-updated" id="last-updated"></div>
   <div class="footer-sig">Responses are logged for tutoring verification records.</div>
 </div>
 
@@ -826,14 +826,24 @@
       });
     } catch(e) { /* silent fail — dashboard still loads */ }
 
-    // Show dashboard
+    // Save session so page refresh doesn't require re-sign-in
+    localStorage.setItem('pt_session', JSON.stringify({ name, subject, location: tutorLocation }));
+
+    showDash(name, subject, tutorLocation);
+  }
+
+  function showDash(name, subject, location) {
+    tutorName     = name;
+    tutorSubject  = subject;
+    tutorLocation = location;
+
     document.getElementById('signin-screen').style.display = 'none';
     document.getElementById('dash-screen').style.display   = 'block';
 
     const first = name.split(' ')[0];
     document.getElementById('dash-greeting').textContent   = 'Welcome, ' + first + '!';
     document.getElementById('dash-subj-badge').textContent = subject;
-    document.getElementById('dash-loc-badge').textContent  = '📍 ' + tutorLocation;
+    document.getElementById('dash-loc-badge').textContent  = '📍 ' + location;
 
     const d = new Date();
     document.getElementById('dash-date').textContent =
@@ -847,7 +857,18 @@
     setInterval(() => loadData(), REFRESH_MS);
   }
 
+  function restoreSession() {
+    try {
+      const saved = localStorage.getItem('pt_session');
+      if (!saved) return;
+      const { name, subject, location } = JSON.parse(saved);
+      if (!name || !subject) return;
+      showDash(name, subject, location || 'ILC');
+    } catch(e) { /* ignore corrupt data */ }
+  }
+
   function signOut() {
+    localStorage.removeItem('pt_session');
     document.getElementById('dash-screen').style.display   = 'none';
     document.getElementById('signin-screen').style.display = 'flex';
     allRows = []; knownRows = new Set(); firstLoad = true; currentFilter = 'mine';
@@ -960,10 +981,6 @@
       renderShoutouts();
       updateStats();
 
-      const now = new Date();
-      document.getElementById('last-updated').textContent =
-        'Last updated: ' + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-
     } catch(err) {
       if (firstLoad) document.getElementById('queue').innerHTML =
         '<div class="empty-state">Could not load data. Check your Apps Script URL.</div>';
@@ -971,6 +988,7 @@
       if (btn) btn.classList.remove('spinning');
     }
   }
+  restoreSession();
 </script>
 </body>
 </html>
