@@ -546,11 +546,18 @@
   </div>
   <div class="panel" id="archive-panel">
     <div class="section-head" onclick="toggleArchive()" style="cursor:pointer">
-      <h2>Helped Archive <span id="archive-count" style="background:#E8DAFF;color:#3C3489;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
+      <h2>Archive <span id="archive-count" style="background:#E8DAFF;color:#3C3489;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
       <span id="archive-arrow" style="color:var(--muted);font-size:18px;transition:transform .2s">▸</span>
     </div>
     <div id="archive-body" style="display:none;margin-top:.75rem">
       <div style="display:flex;gap:8px;margin-bottom:.875rem;flex-wrap:wrap;align-items:center">
+        <select id="archive-status" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+          <option value="">All statuses</option>
+          <option value="Helped">Helped</option>
+          <option value="No Show">No Show</option>
+          <option value="Waiting">Waiting</option>
+          <option value="In Progress">In Progress</option>
+        </select>
         <select id="archive-subj" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
           <option value="">All subjects</option>
           <option>Math</option>
@@ -564,7 +571,7 @@
         <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
         <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
       </div>
-      <div id="archive-list"><p style="font-size:14px;color:var(--hint)">No helped tutees yet.</p></div>
+      <div id="archive-list"><p style="font-size:14px;color:var(--hint)">No records yet.</p></div>
     </div>
   </div>
 
@@ -1031,33 +1038,49 @@
   }
 
   function renderArchive() {
-    const subjFilter = document.getElementById('archive-subj').value;
-    const dateFilter = document.getElementById('archive-date').value; // YYYY-MM-DD
+    const statusFilter = document.getElementById('archive-status') ? document.getElementById('archive-status').value : '';
+    const subjFilter   = document.getElementById('archive-subj').value;
+    const dateFilter   = document.getElementById('archive-date').value;
 
-    let helped = allRows.filter(r => r.status === 'Helped');
-    if (subjFilter) helped = helped.filter(r => r.subject === subjFilter);
+    let rows = [...allRows];
+    if (statusFilter) rows = rows.filter(r => r.status === statusFilter);
+    if (subjFilter)   rows = rows.filter(r => r.subject === subjFilter);
     if (dateFilter) {
       const [yr, mo, dy] = dateFilter.split('-').map(Number);
-      helped = helped.filter(r => {
+      rows = rows.filter(r => {
         const m = (r.timestamp||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
         if (!m) return false;
         return parseInt(m[3])===yr && parseInt(m[1])===mo && parseInt(m[2])===dy;
       });
     }
-    helped.sort((a,b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+    rows.sort((a,b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
 
-    document.getElementById('archive-count').textContent = helped.length;
+    document.getElementById('archive-count').textContent = rows.length;
     const el = document.getElementById('archive-list');
-    if (!helped.length) {
-      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No helped tutees match these filters.</p>';
+    if (!rows.length) {
+      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No records match these filters.</p>';
       return;
     }
-    el.innerHTML = helped.map(r => `
+
+    const statusBadge = s => {
+      const styles = {
+        'Helped':      'background:#D5F5E3;color:#1D6F4E',
+        'No Show':     'background:#F0F0F0;color:#888',
+        'Waiting':     'background:#EBF2FA;color:#2A5C8F',
+        'In Progress': 'background:#FFF3DC;color:#7A4F00',
+      };
+      return `<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;${styles[s]||''}">${s}</span>`;
+    };
+
+    el.innerHTML = rows.map(r => `
       <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--border)">
         <div class="avatar ${avatarColor(r.name)}" style="width:32px;height:32px;font-size:11px;flex-shrink:0">${initials(r.name)}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:500;color:var(--text)">${r.name||'—'}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:1px">${r.subject}${r.course?' · '+r.course:''} · 📍 ${r.location||'ILC'}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:500;color:var(--text)">${r.name||'—'}</span>
+            ${statusBadge(r.status)}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.subject}${r.course?' · '+r.course:''} · 📍 ${r.location||'ILC'}</div>
         </div>
         <div style="font-size:11px;color:var(--hint);text-align:right;flex-shrink:0">${formatArrival(r.timestamp)}</div>
       </div>`).join('');
