@@ -326,7 +326,7 @@
 </head>
 <body>
 
-  <img src="IMG_1709.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
+  <img src="logo.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
   <div class="wordmark">SHS Peer Tutors</div>
 
   <div class="card">
@@ -336,6 +336,11 @@
     </div>
 
     <div class="card-body" id="form-view">
+      <!-- Honeypot — hidden from real users, bots auto-fill it -->
+      <input type="text" id="f-trap" autocomplete="off" tabindex="-1"
+             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"
+             aria-hidden="true">
+
       <div class="field">
         <label>Your name</label>
         <input type="text" id="f-name" placeholder="First and last name" autocomplete="name">
@@ -422,7 +427,7 @@
 
   <script>
     // ── YOUR APPS SCRIPT URL ──────────────────────────────────────────
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaH0ouPlJ8k4FVebBg70FPSht2mPRJM_eHpueIO9ncC76wlNJkE3UzfGV555EZX6SN3w/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjj5PaVhdtz59dAJGToCc8XhdxkPY_3b8P0MzdGyBJS5civd-VkeEqPSZB9xrjJp3fWw/exec";
     // ─────────────────────────────────────────────────────────────────
 
     const COMMON_PERIODS = [
@@ -520,6 +525,25 @@
       document.getElementById('f-subject').classList.toggle('error', !subject);
       if (!name || !subject) return;
 
+      // ── Honeypot check — bots fill hidden fields, humans don't ──
+      if (document.getElementById('f-trap').value) return;
+
+      // ── Frontend duplicate check ──────────────────────────
+      try {
+        const saved = localStorage.getItem('pt_last_submit');
+        if (saved) {
+          const { n, s, t } = JSON.parse(saved);
+          if (Date.now() - t < 3 * 60 * 1000 &&
+              n === name.toLowerCase() && s === subject) {
+            document.getElementById('error-banner').textContent =
+              "You're already checked in! A tutor will find you shortly.";
+            document.getElementById('error-banner').style.display = 'block';
+            return;
+          }
+        }
+      } catch(e) {}
+      // ─────────────────────────────────────────────────────
+
       const btn     = document.getElementById('submit-btn');
       const btnText = document.getElementById('btn-text');
       btn.disabled  = true;
@@ -537,6 +561,11 @@
           body: JSON.stringify({ name, subject, course, topic, scheduled, scheduledTime, location })
         });
 
+        // Save to localStorage to prevent re-submission within 3 min
+        localStorage.setItem('pt_last_submit', JSON.stringify({
+          n: name.toLowerCase(), s: subject, t: Date.now()
+        }));
+
         document.getElementById('success-summary').innerHTML =
           `<strong>${name}</strong> · ${subject}${course ? ' / ' + course : ''}<br>` +
           (scheduled ? `Scheduled: ${scheduledTime}` : `Walk-in · arrived at ${scheduledTime}`) +
@@ -547,6 +576,8 @@
         document.getElementById('success-view').style.display = 'block';
 
       } catch (err) {
+        document.getElementById('error-banner').textContent =
+          'Something went wrong submitting your check-in. Please try again or let a tutor know you\'re here.';
         document.getElementById('error-banner').style.display = 'block';
       } finally {
         btn.disabled = false;
