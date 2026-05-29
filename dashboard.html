@@ -514,7 +514,7 @@
       <h2>Tutee queue</h2>
       <div class="filter-tabs">
         <button class="ftab active" onclick="setFilter('mine',this)">My tutees</button>
-        <button class="ftab" onclick="setFilter('all',this)">All</button>
+        <button class="ftab" onclick="setFilter('all',this)">All tutees</button>
         <button class="ftab" onclick="setFilter('Waiting',this)">Waiting</button>
         <button class="ftab" onclick="setFilter('In Progress',this)">In progress</button>
         <button class="ftab" onclick="setFilter('presched',this)">Pre-scheduled</button>
@@ -544,6 +544,30 @@
       <p style="font-size:14px;color:var(--hint)">No no-shows recorded.</p>
     </div>
   </div>
+  <div class="panel" id="archive-panel">
+    <div class="section-head" onclick="toggleArchive()" style="cursor:pointer">
+      <h2>Helped Archive <span id="archive-count" style="background:#E8DAFF;color:#3C3489;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
+      <span id="archive-arrow" style="color:var(--muted);font-size:18px;transition:transform .2s">▸</span>
+    </div>
+    <div id="archive-body" style="display:none;margin-top:.75rem">
+      <div style="display:flex;gap:8px;margin-bottom:.875rem;flex-wrap:wrap;align-items:center">
+        <select id="archive-subj" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+          <option value="">All subjects</option>
+          <option>Math</option>
+          <option>Communication Arts</option>
+          <option>Computer Science</option>
+          <option>Social Studies</option>
+          <option>Economics</option>
+          <option>Science</option>
+          <option>Language</option>
+        </select>
+        <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
+        <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
+      </div>
+      <div id="archive-list"><p style="font-size:14px;color:var(--hint)">No helped tutees yet.</p></div>
+    </div>
+  </div>
+
   <div class="panel">
     <div class="section-head"><h2>Shoutouts ✦</h2></div>
     <div id="shoutouts"><p style="font-size:14px;color:var(--hint)">No shoutouts yet.</p></div>
@@ -553,7 +577,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaH0ouPlJ8k4FVebBg70FPSht2mPRJM_eHpueIO9ncC76wlNJkE3UzfGV555EZX6SN3w/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjj5PaVhdtz59dAJGToCc8XhdxkPY_3b8P0MzdGyBJS5civd-VkeEqPSZB9xrjJp3fWw/exec";
   const REFRESH_MS = 30000;
 
   const SUBJECT_LOCS = {
@@ -632,6 +656,42 @@
     return new Date() >= start;
   }
 
+  function isToday(row) {
+    if (!row.timestamp) return true;
+    const m = row.timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!m) return true;
+    const today = new Date();
+    return parseInt(m[3]) === today.getFullYear() &&
+           parseInt(m[1]) === (today.getMonth()+1) &&
+           parseInt(m[2]) === today.getDate();
+  }
+
+  // Parse both start & end times from "Period 4a · 11:10 – 11:30 AM"
+  function parseShiftWindow(scheduledTime) {
+    if (!scheduledTime) return null;
+    const m = scheduledTime.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!m) return null;
+    const ampm  = m[5].toUpperCase();
+    const today = new Date();
+    function toDate(hStr, minStr) {
+      let h = parseInt(hStr), min = parseInt(minStr);
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      return new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, min, 0);
+    }
+    return { start: toDate(m[1], m[2]), end: toDate(m[3], m[4]) };
+  }
+
+  // Walk-ins always show; scheduled only show during their period (±15 min buffer)
+  function isCurrentPeriod(row) {
+    if (row.type !== 'Scheduled') return true;
+    const win = parseShiftWindow(row.scheduledTime);
+    if (!win) return true;
+    const now    = new Date();
+    const buffer = 15 * 60 * 1000;
+    return now >= new Date(win.start - buffer) && now <= new Date(win.end.getTime() + buffer);
+  }
+
   function statusClass(s) {
     if (s==='Waiting')     return 'waiting';
     if (s==='In Progress') return 'in-progress';
@@ -649,9 +709,11 @@
   }
 
   function visibleRows() {
-    if (currentFilter === 'presched') return [...allRows].reverse().filter(isPresched).filter(isMine);
-    let rows = [...allRows].reverse().filter(isActive);
-    if (currentFilter === 'mine')        return rows.filter(isMine);
+    const todayRows = allRows.filter(isToday);
+    if (currentFilter === 'presched') return [...todayRows].reverse().filter(isPresched).filter(isMine);
+    let rows = [...todayRows].reverse().filter(isActive);
+    if (currentFilter === 'mine')        return rows.filter(isMine).filter(isCurrentPeriod);
+    if (currentFilter === 'all')         return rows;
     if (currentFilter === 'Waiting')     return rows.filter(r => r.status === 'Waiting' && isMine(r));
     if (currentFilter === 'In Progress') return rows.filter(r => r.status === 'In Progress' && isMine(r));
     return rows;
@@ -732,10 +794,12 @@
 
   function renderCompleted() {
     const helped = allRows
+      .filter(isToday)
       .filter(r => r.status === 'Helped'  && isMine(r))
       .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
 
     const noshow = allRows
+      .filter(isToday)
       .filter(r => r.status === 'No Show' && isMine(r))
       .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
 
@@ -925,7 +989,7 @@
   }
 
   function updateStats() {
-    const mine = allRows.filter(isMine);
+    const mine = allRows.filter(isToday).filter(isMine);
     document.getElementById('s-waiting').textContent  = mine.filter(r=>r.status==='Waiting').length;
     document.getElementById('s-progress').textContent = mine.filter(r=>r.status==='In Progress').length;
     document.getElementById('s-helped').textContent   = mine.filter(r=>r.status==='Helped').length;
@@ -957,6 +1021,48 @@
     } catch(e) {}
   }
 
+  function toggleArchive() {
+    const body  = document.getElementById('archive-body');
+    const arrow = document.getElementById('archive-arrow');
+    const open  = body.style.display === 'block';
+    body.style.display    = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(90deg)';
+    if (!open) renderArchive();
+  }
+
+  function renderArchive() {
+    const subjFilter = document.getElementById('archive-subj').value;
+    const dateFilter = document.getElementById('archive-date').value; // YYYY-MM-DD
+
+    let helped = allRows.filter(r => r.status === 'Helped');
+    if (subjFilter) helped = helped.filter(r => r.subject === subjFilter);
+    if (dateFilter) {
+      const [yr, mo, dy] = dateFilter.split('-').map(Number);
+      helped = helped.filter(r => {
+        const m = (r.timestamp||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (!m) return false;
+        return parseInt(m[3])===yr && parseInt(m[1])===mo && parseInt(m[2])===dy;
+      });
+    }
+    helped.sort((a,b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+
+    document.getElementById('archive-count').textContent = helped.length;
+    const el = document.getElementById('archive-list');
+    if (!helped.length) {
+      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No helped tutees match these filters.</p>';
+      return;
+    }
+    el.innerHTML = helped.map(r => `
+      <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--border)">
+        <div class="avatar ${avatarColor(r.name)}" style="width:32px;height:32px;font-size:11px;flex-shrink:0">${initials(r.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;color:var(--text)">${r.name||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">${r.subject}${r.course?' · '+r.course:''} · 📍 ${r.location||'ILC'}</div>
+        </div>
+        <div style="font-size:11px;color:var(--hint);text-align:right;flex-shrink:0">${formatArrival(r.timestamp)}</div>
+      </div>`).join('');
+  }
+
   async function loadData(manual=false) {
     const btn  = document.getElementById('refresh-btn');
     const icon = document.getElementById('refresh-icon');
@@ -979,6 +1085,7 @@
       renderQueue();
       renderCompleted();
       renderShoutouts();
+      renderArchive();
       updateStats();
 
     } catch(err) {
