@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Peer Tutor Check-In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -27,7 +27,7 @@
     }
 
     body {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       min-height: 100vh;
       display: flex;
@@ -38,9 +38,8 @@
     }
 
     .wordmark {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Serif Display', serif;
       font-size: 15px;
-      font-weight: 600;
       color: #000000;
       letter-spacing: .02em;
       margin-bottom: 1.5rem;
@@ -62,9 +61,9 @@
     }
 
     .card-head h1 {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      font-weight: 400;
       color: var(--text);
       line-height: 1.2;
     }
@@ -83,7 +82,7 @@
     .field label {
       display: block;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .06em;
@@ -94,7 +93,7 @@
     .field select,
     .field textarea {
       width: 100%;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       color: var(--text);
       background: #ffffff;
@@ -132,7 +131,8 @@
     .select-wrap::after {
       content: '';
       position: absolute;
-      right: 14px; top: 50%;
+      right: 14px;
+      top: 50%;
       transform: translateY(-50%);
       width: 0; height: 0;
       border-left: 4px solid transparent;
@@ -152,7 +152,7 @@
       gap: 12px;
     }
 
-    .toggle-label { font-size: 14px; color: var(--text); font-weight: 500; }
+    .toggle-label { font-size: 14px; color: var(--text); }
     .toggle-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
     .toggle {
@@ -184,12 +184,15 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
-    .location-toggle { display: flex; gap: 8px; }
+    .location-toggle {
+      display: flex;
+      gap: 8px;
+    }
 
     .loc-btn {
       flex: 1;
       height: 44px;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       font-weight: 500;
       border: 1px solid var(--border);
@@ -206,6 +209,12 @@
       color: var(--accent);
     }
 
+    .shoutout-hint {
+      font-size: 11px;
+      color: var(--hint);
+      margin-top: 4px;
+    }
+
     .submit-btn {
       width: 100%;
       height: 48px;
@@ -213,9 +222,9 @@
       color: #fff;
       border: none;
       border-radius: var(--radius-sm);
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       margin-top: .75rem;
       display: flex;
@@ -257,9 +266,9 @@
     }
 
     .success-view h2 {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Serif Display', serif;
       font-size: 22px;
-      font-weight: 700;
+      font-weight: 400;
       color: #1A1916;
       margin-bottom: 6px;
     }
@@ -281,7 +290,7 @@
       line-height: 1.7;
     }
 
-    .success-summary strong { color: #1A1916; font-weight: 600; }
+    .success-summary strong { color: #1A1916; font-weight: 500; }
 
     .back-btn {
       margin-top: 1.25rem;
@@ -290,7 +299,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       text-decoration: underline;
       text-underline-offset: 2px;
     }
@@ -317,7 +326,7 @@
 </head>
 <body>
 
-  <img src="IMG_1709.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
+  <img src="logo.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
   <div class="wordmark">SHS Peer Tutors</div>
 
   <div class="card">
@@ -327,11 +336,6 @@
     </div>
 
     <div class="card-body" id="form-view">
-      <!-- Honeypot — hidden from real users, bots auto-fill it -->
-      <input type="text" id="f-trap" autocomplete="off" tabindex="-1"
-             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"
-             aria-hidden="true">
-
       <div class="field">
         <label>Your name</label>
         <input type="text" id="f-name" placeholder="First and last name" autocomplete="name">
@@ -407,17 +411,17 @@
 
     <div class="success-view" id="success-view">
       <div class="success-icon">✓</div>
-      <h2>You're checked in!</h2>
-      <p>A tutor has been notified and will come find you shortly. Grab a seat and hang tight!</p>
+      <h2 id="success-heading"></h2>
+      <p id="success-subtext"></p>
       <div class="success-summary" id="success-summary"></div>
       <button class="back-btn" onclick="resetForm()">← Check in again</button>
     </div>
   </div>
 
-  <div class="footer">Responses are logged for tutoring verification records.</div>
-
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjj5PaVhdtz59dAJGToCc8XhdxkPY_3b8P0MzdGyBJS5civd-VkeEqPSZB9xrjJp3fWw/exec";
+    // ── YOUR APPS SCRIPT URL ──────────────────────────────────────────
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGkGyqXWZFrb0YRT1S6VrzwTGeJ0eLl_it0mLubhac_zm3fu9W7jPPRbpvkV-THjzt/exec";
+    // ─────────────────────────────────────────────────────────────────
 
     const COMMON_PERIODS = [
       "Before School · 7:30 – 8:30 AM",
@@ -477,7 +481,7 @@
       } else {
         locField.style.display = 'none';
         selectedLocation = config.locations[0];
-        locNote.textContent = '📍 Tutoring available in: ' + config.locations[0] + ' only';
+        locNote.textContent = 'Tutoring available in: ' + config.locations[0] + ' only';
         locNote.style.display = 'block';
       }
 
@@ -505,29 +509,14 @@
       const course    = document.getElementById('f-course').value.trim();
       const topic     = document.getElementById('f-topic').value.trim();
       const scheduled = document.getElementById('sched-toggle').classList.contains('on');
-      const scheduledTime = scheduled ? document.getElementById('f-time').value : nowTime();
+      const scheduledTime = scheduled
+        ? document.getElementById('f-time').value
+        : nowTime();
       const location  = selectedLocation || 'ILC';
 
       document.getElementById('f-name').classList.toggle('error', !name);
       document.getElementById('f-subject').classList.toggle('error', !subject);
       if (!name || !subject) return;
-
-      // Honeypot — bots fill hidden fields, humans don't
-      if (document.getElementById('f-trap').value) return;
-
-      // Frontend duplicate check
-      try {
-        const saved = localStorage.getItem('pt_last_submit');
-        if (saved) {
-          const { n, s, t } = JSON.parse(saved);
-          if (Date.now() - t < 3 * 60 * 1000 && n === name.toLowerCase() && s === subject) {
-            document.getElementById('error-banner').textContent =
-              "You're already checked in! A tutor will find you shortly.";
-            document.getElementById('error-banner').style.display = 'block';
-            return;
-          }
-        }
-      } catch(e) {}
 
       const btn     = document.getElementById('submit-btn');
       const btnText = document.getElementById('btn-text');
@@ -546,22 +535,23 @@
           body: JSON.stringify({ name, subject, course, topic, scheduled, scheduledTime, location })
         });
 
-        localStorage.setItem('pt_last_submit', JSON.stringify({
-          n: name.toLowerCase(), s: subject, t: Date.now()
-        }));
+        document.getElementById('success-heading').textContent =
+          scheduled ? `Hey ${name}, thanks for scheduling!`
+                    : `Hey ${name}, thanks for checking in!`;
+        document.getElementById('success-subtext').textContent =
+          scheduled ? "We'll see you when you arrive."
+                    : "You're all set and a tutor will come grab you shortly.";
 
         document.getElementById('success-summary').innerHTML =
           `<strong>${name}</strong> · ${subject}${course ? ' / ' + course : ''}<br>` +
           (scheduled ? `Scheduled: ${scheduledTime}` : `Walk-in · arrived at ${scheduledTime}`) +
-          `<br>📍 ${location}` +
+          `<br>${location}` +
           (topic ? `<br>${topic}` : '');
 
         document.getElementById('form-view').style.display = 'none';
         document.getElementById('success-view').style.display = 'block';
 
       } catch (err) {
-        document.getElementById('error-banner').textContent =
-          "Something went wrong. Please try again or let a tutor know you're here.";
         document.getElementById('error-banner').style.display = 'block';
       } finally {
         btn.disabled = false;
