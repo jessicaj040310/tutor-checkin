@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PT Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -28,7 +28,7 @@
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       background: var(--bg);
       min-height: 100vh;
       padding: 2rem 1rem;
@@ -52,8 +52,9 @@
     }
 
     .signin-wordmark {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 15px;
+      font-weight: 600;
       color: #000;
       text-align: center;
       margin-bottom: 1.5rem;
@@ -74,9 +75,9 @@
     }
 
     .signin-head h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 24px;
-      font-weight: 400;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
       color: var(--text);
     }
 
@@ -93,7 +94,7 @@
     .field label {
       display: block;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .06em;
@@ -103,7 +104,7 @@
     .field input,
     .field select {
       width: 100%;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 15px;
       color: var(--text);
       background: #fff;
@@ -143,7 +144,7 @@
     .loc-btn {
       flex: 1;
       height: 44px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 15px;
       font-weight: 500;
       border: 1px solid var(--border);
@@ -173,9 +174,9 @@
       color: #fff;
       border: none;
       border-radius: var(--radius-sm);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       margin-top: .5rem;
       transition: opacity .15s;
@@ -196,9 +197,9 @@
     }
 
     .topbar-left h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 26px;
-      font-weight: 400;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
       color: #fff;
     }
 
@@ -238,7 +239,7 @@
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
 
     .icon-btn {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 13px;
       color: #fff;
       background: rgba(255,255,255,.15);
@@ -260,7 +261,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       text-decoration: underline;
       text-underline-offset: 2px;
       padding: 0;
@@ -279,8 +280,8 @@
       padding: .875rem 1rem;
     }
 
-    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.8); margin-bottom: 4px; }
-    .stat-value { font-size: 26px; font-weight: 500; color: #fff; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.8); margin-bottom: 4px; font-weight: 600; }
+    .stat-value { font-size: 26px; font-weight: 600; color: #fff; }
     .stat-value.red   { color: #FFD6D6; }
     .stat-value.green { color: #C8F7C5; }
 
@@ -315,15 +316,15 @@
     }
 
     .section-head h2 {
-      font-size: 13px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: .07em;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
       color: var(--muted);
     }
 
-    .filter-tabs { display: flex; gap: 4px; }
+    .filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
 
     .ftab {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 12px; padding: 4px 12px;
       border-radius: 20px;
       border: 1px solid var(--border);
@@ -356,7 +357,7 @@
       width: 38px; height: 38px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 500; flex-shrink: 0;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
     }
 
     .av-blue   { background: #EBF2FA; color: #2A5C8F; }
@@ -368,7 +369,7 @@
     .av-orange { background: #FFE5CC; color: #7A4F00; }
 
     .tutee-body { flex: 1; min-width: 0; }
-    .tutee-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .tutee-name { font-size: 14px; font-weight: 600; color: var(--text); }
 
     .tutee-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 3px; }
 
@@ -388,7 +389,7 @@
     .tutee-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
 
     .status-sel {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-size: 12px;
       padding: 4px 26px 4px 10px;
       border-radius: 20px;
@@ -422,9 +423,13 @@
     .shoutout-text { font-size: 13px; color: var(--text); line-height: 1.5; }
     .shoutout-from { font-size: 12px; color: var(--hint); margin-top: 2px; }
 
-    .last-updated { font-size: 11px; color: rgba(255,255,255,.6); text-align: center; margin-top: 1rem; }
-
     .footer-sig { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; margin-top: .5rem; }
+
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .topbar { flex-direction: column; gap: 10px; }
+      .topbar-right { flex-direction: row !important; align-items: center !important; flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
@@ -544,6 +549,7 @@
       <p style="font-size:14px;color:var(--hint)">No no-shows recorded.</p>
     </div>
   </div>
+
   <div class="panel" id="archive-panel">
     <div class="section-head" onclick="toggleArchive()" style="cursor:pointer">
       <h2>Archive <span id="archive-count" style="background:#E8DAFF;color:#3C3489;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
@@ -551,14 +557,14 @@
     </div>
     <div id="archive-body" style="display:none;margin-top:.75rem">
       <div style="display:flex;gap:8px;margin-bottom:.875rem;flex-wrap:wrap;align-items:center">
-        <select id="archive-status" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+        <select id="archive-status" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
           <option value="">All statuses</option>
           <option value="Helped">Helped</option>
           <option value="No Show">No Show</option>
           <option value="Waiting">Waiting</option>
           <option value="In Progress">In Progress</option>
         </select>
-        <select id="archive-subj" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+        <select id="archive-subj" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
           <option value="">All subjects</option>
           <option>Math</option>
           <option>Communication Arts</option>
@@ -568,8 +574,8 @@
           <option>Science</option>
           <option>Language</option>
         </select>
-        <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
-        <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
+        <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
+        <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
       </div>
       <div id="archive-list"><p style="font-size:14px;color:var(--hint)">No records yet.</p></div>
     </div>
@@ -617,17 +623,6 @@
     return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
   }
 
-  function timeAgo(ts) {
-    if (!ts) return '';
-    const d = new Date(ts);
-    if (isNaN(d)) return ts;
-    const s = Math.floor((Date.now()-d)/1000);
-    if (s < 60) return 'just now';
-    if (s < 3600) return Math.floor(s/60)+' min ago';
-    return Math.floor(s/3600)+' hr ago';
-  }
-
-  // Format "05/24/2026 2:34 PM" → "May 24 · 2:34 PM"
   function formatArrival(ts) {
     if (!ts) return '';
     const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
@@ -640,10 +635,8 @@
     return ts;
   }
 
-  // Parse start time from shift string like "Period 5a · 12:02 – 12:22 PM"
   function parseShiftStart(scheduledTime) {
     if (!scheduledTime) return null;
-    // Match first time and AM/PM (could be at end of string)
     const match = scheduledTime.match(/(\d{1,2}):(\d{2})\s*(?:[–\-].*?)?\s*(AM|PM)/i);
     if (!match) return null;
     let h = parseInt(match[1]);
@@ -655,7 +648,6 @@
     return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
   }
 
-  // Has this scheduled tutee's period started yet?
   function shiftStarted(row) {
     if (row.type !== 'Scheduled') return true;
     const start = parseShiftStart(row.scheduledTime);
@@ -673,7 +665,6 @@
            parseInt(m[2]) === today.getDate();
   }
 
-  // Parse both start & end times from "Period 4a · 11:10 – 11:30 AM"
   function parseShiftWindow(scheduledTime) {
     if (!scheduledTime) return null;
     const m = scheduledTime.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
@@ -689,7 +680,6 @@
     return { start: toDate(m[1], m[2]), end: toDate(m[3], m[4]) };
   }
 
-  // Walk-ins always show; scheduled only show during their period (±15 min buffer)
   function isCurrentPeriod(row) {
     if (row.type !== 'Scheduled') return true;
     const win = parseShiftWindow(row.scheduledTime);
@@ -713,6 +703,10 @@
 
   function isPresched(row) {
     return row.type === 'Scheduled' && row.status === 'Waiting' && !shiftStarted(row);
+  }
+
+  function isMine(row) {
+    return row.subject === tutorSubject && row.location === tutorLocation;
   }
 
   function visibleRows() {
@@ -773,7 +767,7 @@
             <div class="tutee-pills">
               <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
               <span class="pill ${typeClass}">${r.type||'Walk-in'}</span>
-              <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+              <span class="pill pill-loc">${r.location||'ILC'}</span>
             </div>
             ${r.topic ? `<div class="tutee-topic">${r.topic}</div>` : ''}
             <div class="tutee-time">${arrivalLine(r)}</div>
@@ -787,7 +781,6 @@
     }).join('');
   }
 
-  // Parse "MM/dd/yyyy h:mm a" into a Date for sorting
   function parseTimestamp(ts) {
     if (!ts) return new Date(0);
     const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
@@ -802,7 +795,7 @@
   function renderCompleted() {
     const helped = allRows
       .filter(isToday)
-      .filter(r => r.status === 'Helped'  && isMine(r))
+      .filter(r => r.status === 'Helped' && isMine(r))
       .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
 
     const noshow = allRows
@@ -810,14 +803,12 @@
       .filter(r => r.status === 'No Show' && isMine(r))
       .sort((a,b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp));
 
-    // Completed
     document.getElementById('completed-count').textContent = helped.length;
     const cList = document.getElementById('completed-list');
     cList.innerHTML = helped.length
       ? helped.map(r => completedCard(r, 'Helped')).join('')
       : '<p style="font-size:14px;color:var(--hint)">No completed tutees yet.</p>';
 
-    // No shows
     document.getElementById('noshow-count').textContent = noshow.length;
     const nList = document.getElementById('noshow-list');
     nList.innerHTML = noshow.length
@@ -833,7 +824,7 @@
           <div class="tutee-name">${r.name||'—'}</div>
           <div class="tutee-pills">
             <span class="pill pill-subj">${r.subject}${r.course?' · '+r.course:''}</span>
-            <span class="pill pill-loc">📍 ${r.location||'ILC'}</span>
+            <span class="pill pill-loc">${r.location||'ILC'}</span>
           </div>
           <div class="tutee-time">${arrivalLine(r)}</div>
         </div>
@@ -858,7 +849,7 @@
     } else if (locs.length === 1) {
       locField.style.display = 'none';
       locNote.style.display  = 'block';
-      locNote.textContent    = '📍 Tutoring in: ' + locs[0] + ' only';
+      locNote.textContent    = 'Tutoring in: ' + locs[0] + ' only';
       tutorLocation = locs[0];
     } else {
       locField.style.display = 'none';
@@ -880,26 +871,16 @@
     document.getElementById('t-subject').classList.toggle('err', !subject);
     if (!name || !subject) return;
 
-    tutorName    = name;
-    tutorSubject = subject;
-
     try {
       await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type:      'tutor_signin',
-          tutorName: name,
-          subject:   subject,
-          location:  tutorLocation
-        })
+        body: JSON.stringify({ type: 'tutor_signin', tutorName: name, subject, location: tutorLocation })
       });
-    } catch(e) { /* silent fail — dashboard still loads */ }
+    } catch(e) {}
 
-    // Save session so page refresh doesn't require re-sign-in
     localStorage.setItem('pt_session', JSON.stringify({ name, subject, location: tutorLocation }));
-
     showDash(name, subject, tutorLocation);
   }
 
@@ -911,18 +892,15 @@
     document.getElementById('signin-screen').style.display = 'none';
     document.getElementById('dash-screen').style.display   = 'block';
 
-    const first = name.split(' ')[0];
-    document.getElementById('dash-greeting').textContent   = 'Welcome, ' + first + '!';
-    document.getElementById('dash-subj-badge').textContent = subject;
-    document.getElementById('dash-loc-badge').textContent  = '📍 ' + location;
+    document.getElementById('dash-greeting').textContent = 'SHS Peer Tutors';
+    document.getElementById('dash-subj-badge').textContent = name + ' · ' + subject;
+    document.getElementById('dash-loc-badge').textContent  = location;
 
     const d = new Date();
     document.getElementById('dash-date').textContent =
       d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
-    if (Notification && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
+    if (Notification && Notification.permission === 'default') Notification.requestPermission();
 
     loadData();
     setInterval(() => loadData(), REFRESH_MS);
@@ -935,7 +913,7 @@
       const { name, subject, location } = JSON.parse(saved);
       if (!name || !subject) return;
       showDash(name, subject, location || 'ILC');
-    } catch(e) { /* ignore corrupt data */ }
+    } catch(e) {}
   }
 
   function signOut() {
@@ -945,14 +923,8 @@
     allRows = []; knownRows = new Set(); firstLoad = true; currentFilter = 'mine';
     document.getElementById('t-name').value    = '';
     document.getElementById('t-subject').value = '';
-    document.getElementById('loc-field').style.display    = 'none';
+    document.getElementById('loc-field').style.display     = 'none';
     document.getElementById('loc-only-note').style.display = 'none';
-  }
-
-  // ── Dashboard data ──────────────────────────────────────
-
-  function isMine(row) {
-    return row.subject === tutorSubject && row.location === tutorLocation;
   }
 
   function setFilter(f, btn) {
@@ -976,6 +948,67 @@
     const open  = list.style.display === 'block';
     list.style.display    = open ? 'none' : 'block';
     arrow.style.transform = open ? '' : 'rotate(90deg)';
+  }
+
+  function toggleArchive() {
+    const body  = document.getElementById('archive-body');
+    const arrow = document.getElementById('archive-arrow');
+    const open  = body.style.display === 'block';
+    body.style.display    = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(90deg)';
+    if (!open) {
+      document.getElementById('archive-status').value = 'Helped';
+      renderArchive();
+    }
+  }
+
+  function renderArchive() {
+    const statusFilter = document.getElementById('archive-status').value;
+    const subjFilter   = document.getElementById('archive-subj').value;
+    const dateFilter   = document.getElementById('archive-date').value;
+
+    let rows = [...allRows];
+    if (statusFilter) rows = rows.filter(r => r.status === statusFilter);
+    if (subjFilter)   rows = rows.filter(r => r.subject === subjFilter);
+    if (dateFilter) {
+      const [yr, mo, dy] = dateFilter.split('-').map(Number);
+      rows = rows.filter(r => {
+        const m = (r.timestamp||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (!m) return false;
+        return parseInt(m[3])===yr && parseInt(m[1])===mo && parseInt(m[2])===dy;
+      });
+    }
+    rows.sort((a,b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+
+    document.getElementById('archive-count').textContent = rows.length;
+    const el = document.getElementById('archive-list');
+    if (!rows.length) {
+      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No records match these filters.</p>';
+      return;
+    }
+
+    const statusBadge = s => {
+      const styles = {
+        'Helped':      'background:#D5F5E3;color:#1D6F4E',
+        'No Show':     'background:#F0F0F0;color:#888',
+        'Waiting':     'background:#EBF2FA;color:#2A5C8F',
+        'In Progress': 'background:#FFF3DC;color:#7A4F00',
+      };
+      return `<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;${styles[s]||''}">${s}</span>`;
+    };
+
+    el.innerHTML = rows.map(r => `
+      <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--border)">
+        <div class="avatar ${avatarColor(r.name)}" style="width:32px;height:32px;font-size:11px;flex-shrink:0">${initials(r.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:600;color:var(--text)">${r.name||'—'}</span>
+            ${statusBadge(r.status)}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.subject}${r.course?' · '+r.course:''} · ${r.location||'ILC'}</div>
+        </div>
+        <div style="font-size:11px;color:var(--hint);text-align:right;flex-shrink:0">${formatArrival(r.timestamp)}</div>
+      </div>`).join('');
   }
 
   function renderShoutouts() {
@@ -1028,67 +1061,8 @@
     } catch(e) {}
   }
 
-  function toggleArchive() {
-    const body  = document.getElementById('archive-body');
-    const arrow = document.getElementById('archive-arrow');
-    const open  = body.style.display === 'block';
-    body.style.display    = open ? 'none' : 'block';
-    arrow.style.transform = open ? '' : 'rotate(90deg)';
-    if (!open) renderArchive();
-  }
-
-  function renderArchive() {
-    const statusFilter = document.getElementById('archive-status') ? document.getElementById('archive-status').value : '';
-    const subjFilter   = document.getElementById('archive-subj').value;
-    const dateFilter   = document.getElementById('archive-date').value;
-
-    let rows = [...allRows];
-    if (statusFilter) rows = rows.filter(r => r.status === statusFilter);
-    if (subjFilter)   rows = rows.filter(r => r.subject === subjFilter);
-    if (dateFilter) {
-      const [yr, mo, dy] = dateFilter.split('-').map(Number);
-      rows = rows.filter(r => {
-        const m = (r.timestamp||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-        if (!m) return false;
-        return parseInt(m[3])===yr && parseInt(m[1])===mo && parseInt(m[2])===dy;
-      });
-    }
-    rows.sort((a,b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
-
-    document.getElementById('archive-count').textContent = rows.length;
-    const el = document.getElementById('archive-list');
-    if (!rows.length) {
-      el.innerHTML = '<p style="font-size:14px;color:var(--hint)">No records match these filters.</p>';
-      return;
-    }
-
-    const statusBadge = s => {
-      const styles = {
-        'Helped':      'background:#D5F5E3;color:#1D6F4E',
-        'No Show':     'background:#F0F0F0;color:#888',
-        'Waiting':     'background:#EBF2FA;color:#2A5C8F',
-        'In Progress': 'background:#FFF3DC;color:#7A4F00',
-      };
-      return `<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;${styles[s]||''}">${s}</span>`;
-    };
-
-    el.innerHTML = rows.map(r => `
-      <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--border)">
-        <div class="avatar ${avatarColor(r.name)}" style="width:32px;height:32px;font-size:11px;flex-shrink:0">${initials(r.name)}</div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span style="font-size:13px;font-weight:500;color:var(--text)">${r.name||'—'}</span>
-            ${statusBadge(r.status)}
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.subject}${r.course?' · '+r.course:''} · 📍 ${r.location||'ILC'}</div>
-        </div>
-        <div style="font-size:11px;color:var(--hint);text-align:right;flex-shrink:0">${formatArrival(r.timestamp)}</div>
-      </div>`).join('');
-  }
-
   async function loadData(manual=false) {
-    const btn  = document.getElementById('refresh-btn');
-    const icon = document.getElementById('refresh-icon');
+    const btn = document.getElementById('refresh-btn');
     if (btn) btn.classList.add('spinning');
 
     try {
@@ -1118,6 +1092,7 @@
       if (btn) btn.classList.remove('spinning');
     }
   }
+
   restoreSession();
 </script>
 </body>
