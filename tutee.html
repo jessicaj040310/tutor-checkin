@@ -208,12 +208,6 @@
       color: var(--accent);
     }
 
-    .shoutout-hint {
-      font-size: 11px;
-      color: var(--hint);
-      margin-top: 4px;
-    }
-
     .submit-btn {
       width: 100%;
       height: 48px;
@@ -472,8 +466,7 @@
       let h = d.getHours(), m = d.getMinutes();
       const ampm = h >= 12 ? 'PM' : 'AM';
       h = h % 12 || 12;
-      const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
-      return `${dateStr} (${h}:${String(m).padStart(2, '0')} ${ampm})`;
+      return `${d.getMonth() + 1}/${d.getDate()} ${h}:${String(m).padStart(2, '0')} ${ampm}`;
     }
 
     function toggleSched(el) {
@@ -524,7 +517,7 @@
 
         document.getElementById('success-summary').innerHTML =
           `<strong>${name}</strong> · ${subject}${course ? ' / ' + course : ''}<br>` +
-          (scheduled ? `Scheduled: ${scheduledTime}` : `Walk-in · arrived at ${scheduledTime}`) +
+          (scheduled ? `Scheduled: ${scheduledTime}` : `Walk-in · ${scheduledTime}`) +
           `<br>${location}` +
           (topic ? `<br>${topic}` : '');
 
