@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PT Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -28,13 +26,11 @@
     }
 
     body {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       background: var(--bg);
       min-height: 100vh;
       padding: 2rem 1rem;
     }
-
-    /* ── Sign-in screen ── */
 
     .signin-wrap {
       display: flex;
@@ -52,7 +48,7 @@
     }
 
     .signin-wordmark {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 15px;
       font-weight: 600;
       color: #000;
@@ -75,7 +71,7 @@
     }
 
     .signin-head h1 {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 22px;
       font-weight: 700;
       color: var(--text);
@@ -104,7 +100,7 @@
     .field input,
     .field select {
       width: 100%;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 15px;
       color: var(--text);
       background: #fff;
@@ -144,7 +140,7 @@
     .loc-btn {
       flex: 1;
       height: 44px;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 15px;
       font-weight: 500;
       border: 1px solid var(--border);
@@ -174,7 +170,7 @@
       color: #fff;
       border: none;
       border-radius: var(--radius-sm);
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -183,8 +179,6 @@
     }
 
     .start-btn:hover { opacity: .88; }
-
-    /* ── Dashboard screen ── */
 
     .dash { display: none; max-width: 780px; margin: 0 auto; }
 
@@ -197,7 +191,7 @@
     }
 
     .topbar-left h1 {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 24px;
       font-weight: 700;
       color: #fff;
@@ -239,7 +233,7 @@
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
 
     .icon-btn {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 13px;
       color: #fff;
       background: rgba(255,255,255,.15);
@@ -261,7 +255,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       text-decoration: underline;
       text-underline-offset: 2px;
       padding: 0;
@@ -324,7 +318,7 @@
     .filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
 
     .ftab {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 12px; padding: 4px 12px;
       border-radius: 20px;
       border: 1px solid var(--border);
@@ -389,7 +383,7 @@
     .tutee-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
 
     .status-sel {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Stevenson', sans-serif;
       font-size: 12px;
       padding: 4px 26px 4px 10px;
       border-radius: 20px;
@@ -415,15 +409,11 @@
       border: 1px solid #f0e5b8;
       border-radius: var(--radius-sm);
       padding: .875rem 1rem;
-      display: flex; gap: 10px;
       margin-bottom: 8px;
     }
 
-    .shoutout-star { font-size: 18px; flex-shrink: 0; }
     .shoutout-text { font-size: 13px; color: var(--text); line-height: 1.5; }
     .shoutout-from { font-size: 12px; color: var(--hint); margin-top: 2px; }
-
-    .footer-sig { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; margin-top: .5rem; }
 
     @media (max-width: 480px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
@@ -434,7 +424,6 @@
 </head>
 <body>
 
-<!-- ── SIGN-IN SCREEN ── -->
 <div class="signin-wrap" id="signin-screen">
   <img src="IMG_1709.png" alt="SHS logo" class="signin-logo">
   <div class="signin-wordmark">SHS Peer Tutors</div>
@@ -502,7 +491,6 @@
   </div>
 </div>
 
-<!-- ── DASHBOARD SCREEN ── -->
 <div class="dash" id="dash-screen">
 
   <div class="topbar">
@@ -582,14 +570,14 @@
     </div>
     <div id="archive-body" style="display:none;margin-top:.75rem">
       <div style="display:flex;gap:8px;margin-bottom:.875rem;flex-wrap:wrap;align-items:center">
-        <select id="archive-status" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+        <select id="archive-status" onchange="renderArchive()" style="font-family:'Stevenson',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
           <option value="">All statuses</option>
           <option value="Helped">Helped</option>
           <option value="No Show">No Show</option>
           <option value="Waiting">Waiting</option>
           <option value="In Progress">In Progress</option>
         </select>
-        <select id="archive-subj" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
+        <select id="archive-subj" onchange="renderArchive()" style="font-family:'Stevenson',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer;appearance:none">
           <option value="">All subjects</option>
           <option>Math</option>
           <option>Communication Arts</option>
@@ -599,8 +587,8 @@
           <option>Science</option>
           <option>Language</option>
         </select>
-        <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
-        <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'Open Sans',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
+        <input type="date" id="archive-date" onchange="renderArchive()" style="font-family:'Stevenson',sans-serif;font-size:13px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none;cursor:pointer">
+        <button onclick="document.getElementById('archive-date').value='';renderArchive()" style="font-family:'Stevenson',sans-serif;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Clear date</button>
       </div>
       <div id="archive-list"><p style="font-size:14px;color:var(--hint)">No records yet.</p></div>
     </div>
@@ -608,7 +596,7 @@
 
   <div class="panel" id="shoutout-panel">
     <div class="section-head" onclick="toggleShoutouts()" style="cursor:pointer">
-      <h2>Shoutouts ✦ <span id="shoutout-count" style="background:#FFF3CC;color:#7A4F00;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
+      <h2>Shoutouts <span id="shoutout-count" style="background:#FFF3CC;color:#7A4F00;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px">0</span></h2>
       <span id="shoutout-arrow" style="color:var(--muted);font-size:18px;transition:transform .2s">▸</span>
     </div>
     <div id="shoutouts" style="display:none;margin-top:.5rem">
@@ -658,10 +646,9 @@
     if (!ts) return '';
     const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
     if (match) {
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const month = months[parseInt(match[1])-1];
+      const month = parseInt(match[1]);
       const day   = parseInt(match[2]);
-      return `${month} ${day} · ${match[4]}:${match[5]} ${match[6].toUpperCase()}`;
+      return `${month}/${day} (${match[4]}:${match[5]} ${match[6].toUpperCase()})`;
     }
     return ts;
   }
@@ -761,7 +748,7 @@
     const opts = [
       ['Waiting',     'Waiting'],
       ['In Progress', 'In progress'],
-      ['Helped',      'Helped ✓'],
+      ['Helped',      'Helped'],
       ['No Show',     'No show'],
     ];
     return opts.map(([val, label]) =>
@@ -1079,7 +1066,6 @@
     }
     el.innerHTML = shouts.map(r => `
       <div class="shoutout-card">
-        <div class="shoutout-star">★</div>
         <div>
           <div class="shoutout-text">${r.shoutout}</div>
           <div class="shoutout-from">— ${r.name} · ${r.subject}</div>
