@@ -326,7 +326,7 @@
 </head>
 <body>
 
-  <img src="logo.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
+  <img src="IMG_1709.png" alt="SHS Peer Tutors logo" style="width:72px;height:auto;display:block;margin:0 auto 0.5rem;">
   <div class="wordmark">SHS Peer Tutors</div>
 
   <div class="card">
@@ -409,7 +409,7 @@
     </div>
 
     <div class="success-view" id="success-view">
-      <img src="IMG_3456.png" alt="" style="width:64px;height:64px;object-fit:contain;margin:0 auto 1.25rem;display:block;border-radius:50%">
+      <img src="IMG_3456.png" alt="" style="width:110px;height:110px;object-fit:contain;margin:0 auto 1.25rem;display:block;border-radius:50%">
       <h2 id="success-heading"></h2>
       <p id="success-subtext"></p>
       <div class="success-summary" id="success-summary"></div>
@@ -551,6 +551,8 @@
         document.getElementById('success-view').style.display = 'block';
 
       } catch (err) {
+        console.error('submitForm error:', err);
+        document.getElementById('error-banner').textContent = `Error: ${err.message}`;
         document.getElementById('error-banner').style.display = 'block';
       } finally {
         btn.disabled = false;
