@@ -644,7 +644,7 @@
 
   function formatArrival(ts) {
     if (!ts) return '';
-    if (ts.startsWith && ts.startsWith('Scheduled:')) return ts;
+    if (typeof ts === 'string' && ts.startsWith('Scheduled:')) return ts;
 
     const d = new Date(ts);
     if (!isNaN(d.getTime())) {
@@ -1145,76 +1145,3 @@
 </script>
 </body>
 </html>
-```The reason yesterday's tutees are still showing up in the queue and the times look weird is because of how the timestamp was saved to your Google Sheet. Right now, it's saving as a long string like `Mon Aug 10 2026 09:09:43 GMT-0500...`. The dashboard's old date parser was strictly looking for a simple `8/10/2026` format, so when it couldn't read the long text, it panicked and defaulted to treating those entries as "today."
-
-### Should you filter by shift?
-It is completely fine the way it is! Actually, keeping it open is a much better choice. 
-
-According to UI design best practices, the right approach is to design filters based on what users want to find. For a tutoring dashboard, your tutors just need to know who is waiting *right now*. If you strictly lock visibility to specific shifts, early arrivals or students whose sessions run long will suddenly disappear from the screen during a shift change. It is better to focus on the filters that users actually need (like subject and location) rather than overcomplicating things.
-
-### The Fix
-
-To clean up those long timestamps into a neat **8/10 9:09 AM** format and make sure the dashboard instantly archives yesterday's tutees, you just need to replace three of your helper functions in the JavaScript section of your HTML file.
-
-Find and replace `formatArrival`, `isToday`, and `parseTimestamp` with this updated code:
-
-```javascript
-  function formatArrival(ts) {
-    if (!ts) return '';
-    if (typeof ts === 'string' && ts.startsWith('Scheduled:')) return ts;
-
-    // Try parsing the long GMT string first
-    const d = new Date(ts);
-    if (!isNaN(d.getTime())) {
-      let h = d.getHours();
-      const m = String(d.getMinutes()).padStart(2, '0');
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      h = h % 12 || 12;
-      return `${d.getMonth() + 1}/${d.getDate()} ${h}:${m} ${ampm}`;
-    }
-
-    // Fallback regex for standard M/D/YYYY H:MM AM/PM format
-    const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
-    if (match) {
-      return `${parseInt(match[1])}/${parseInt(match[2])} ${match[4]}:${match[5]} ${match[6].toUpperCase()}`;
-    }
-    return ts;
-  }
-
-  function isToday(row) {
-    if (!row.timestamp) return true;
-
-    // Standard Javascript date parsing
-    const d = new Date(row.timestamp);
-    if (!isNaN(d.getTime())) {
-      const today = new Date();
-      return d.getFullYear() === today.getFullYear() &&
-             d.getMonth() === today.getMonth() &&
-             d.getDate() === today.getDate();
-    }
-
-    // Fallback regex for basic M/D/YYYY
-    const m = row.timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if (m) {
-      const today = new Date();
-      return parseInt(m[3]) === today.getFullYear() &&
-             parseInt(m[1]) === (today.getMonth() + 1) &&
-             parseInt(m[2]) === today.getDate();
-    }
-
-    return true;
-  }
-
-  function parseTimestamp(ts) {
-    if (!ts) return new Date(0);
-    const d = new Date(ts);
-    if (!isNaN(d.getTime())) return d;
-
-    const match = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s+(AM|PM)/i);
-    if (!match) return new Date(0);
-    let h = parseInt(match[4]);
-    const ampm = match[6].toUpperCase();
-    if (ampm === 'PM' && h !== 12) h += 12;
-    if (ampm === 'AM' && h === 12) h = 0;
-    return new Date(parseInt(match[3]), parseInt(match[1])-1, parseInt(match[2]), h, parseInt(match[5]));
-  }
